@@ -36,6 +36,7 @@ class _AuthCardState extends State<AuthCard>
   //text form field focus node
   FocusNode _emailFocusNode = new FocusNode();
   FocusNode _passFocusNode = new FocusNode();
+  FocusNode _confirmFocusNode = new FocusNode();
 
   AnimationController _controller;
   Animation<Offset> _slideAnimation;
@@ -47,6 +48,7 @@ class _AuthCardState extends State<AuthCard>
     super.initState();
     _emailFocusNode = FocusNode();
     _passFocusNode = FocusNode();
+    _confirmFocusNode = FocusNode();
 
     _controller = AnimationController(
       vsync: this,
@@ -69,11 +71,97 @@ class _AuthCardState extends State<AuthCard>
   void dispose() {
     _emailFocusNode.dispose();
     _passFocusNode.dispose();
+    _confirmFocusNode.dispose();
     _controller.dispose();
     super.dispose();
   }
 
-  //TODO: SWITCH AUTHENTICATION MODE FUNCTION
+//function to switch from sign up to login or vice versa
+  void _switchAuthMode() {
+    if (_authMode == AuthMode.Login) {
+      setState(() {
+        _authMode = AuthMode.Signup;
+      });
+      _controller.forward();
+    } else {
+      setState(() {
+        _authMode = AuthMode.Login;
+      });
+      _controller.reverse();
+    }
+  }
+
+  //show error pop up
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('An Error Occured!'),
+        content: Text(message),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: Text('Okay'),
+          ),
+        ],
+      ),
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+
+    _formKey.currentState.save();
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      if (_authMode == AuthMode.Login) {
+        //Log user in
+        await Provider.of<Auth>(context, listen: false)
+            .signin(_authData['email'], _authData['password']);
+      } else {
+        //Sign user up
+        await Provider.of<Auth>(context, listen: false)
+            .signup(_authData['email'], _authData['password']);
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    } on HttpException catch (error) {
+      var errorMessage = 'Authentication Failed';
+
+      //If statements for every error message backend gives
+      //This is the front end receiver for the http_exceptions to display in front end
+      if (error.toString().contains('EMAIL_EXISTS')) {
+        errorMessage = 'This email address is already in use';
+      } else if (error.toString().contains('INVALID_EMAIL')) {
+        errorMessage = 'This is not a valid email address';
+      } else if (error.toString().contains('WEAK_PASSWORD')) {
+        errorMessage = 'This password is too weak.';
+      } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
+        errorMessage = 'Could not find a user with that email.';
+      } else if (error.toString().contains('INVALID_PASSWORD')) {
+        errorMessage = 'Invalid password.';
+      }
+
+      _showErrorDialog(errorMessage);
+    } catch (error) {
+      //error from phone
+      const errorMessage =
+          'Could not authenticate you. Check your internet conncetion';
+      _showErrorDialog(errorMessage);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,6 +235,9 @@ class _AuthCardState extends State<AuthCard>
                     }
                     return null;
                   },
+                  onSaved: (value) {
+                    _authData['password'] = value;
+                  },
                 ),
                 AnimatedContainer(
                   constraints: BoxConstraints(
@@ -159,8 +250,16 @@ class _AuthCardState extends State<AuthCard>
                       position: _slideAnimation,
                       child: TextFormField(
                           enabled: _authMode == AuthMode.Signup,
-                          decoration:
-                              InputDecoration(labelText: 'Confirm Password'),
+                          decoration: InputDecoration(
+                            labelText: 'Confirm Password',
+                            labelStyle: TextStyle(
+                                color: _confirmFocusNode.hasFocus
+                                    ? Colors.green
+                                    : Colors.white),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: new BorderSide(color: Colors.white),
+                            ),
+                          ),
                           obscureText: true,
                           //Validator only works if the _authMode is Signup
                           validator: _authMode == AuthMode.Signup
@@ -188,7 +287,7 @@ class _AuthCardState extends State<AuthCard>
                   RaisedButton(
                     child:
                         Text(_authMode == AuthMode.Login ? 'LOGIN' : 'SIGN UP'),
-                    onPressed: () {},
+                    onPressed: _submit,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -200,7 +299,7 @@ class _AuthCardState extends State<AuthCard>
                 FlatButton(
                   child: Text(
                       '${_authMode == AuthMode.Login ? 'SIGNUP' : 'LOGIN'} INSTEAD'),
-                  onPressed: () {},
+                  onPressed: _switchAuthMode,
                   padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 4),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   textColor: Theme.of(context).primaryColor,
