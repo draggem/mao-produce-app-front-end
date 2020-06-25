@@ -1,21 +1,48 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_login/flutter_login.dart';
+import 'dart:math';
 
-class AuthenticationScreen extends StatelessWidget {
-  Future<String> _submit(LoginData data) async {
-    print(data);
-    return null;
-  }
+import 'package:flutter/material.dart';
+
+import '../widgets/auth_card.dart';
+
+class AuthScreen extends StatelessWidget {
+  static const routeName = '/auth'; //route name to navigat to this screen
 
   @override
   Widget build(BuildContext context) {
-    return FlutterLogin(
-      title: '',
-      logo: 'assets/img/maoproduceLogo.png',
-      onLogin: _submit,
-      onSignup: _submit,
-      // onSubmitAnimationCompleted: (_) {},
-      onRecoverPassword: (_) => Future(null),
+    final deviceSize = MediaQuery.of(context).size;
+    final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
+    transformConfig.translate(-10.0);
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.green,
+            ),
+          ),
+          Container(
+            height: deviceSize.height,
+            width: deviceSize.width,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Flexible(
+                  child: Container(
+                    padding: EdgeInsets.all(40),
+                    child:
+                        Image.asset('assets/img/maoProduceLeaf.png', width: 70),
+                  ),
+                ),
+                Flexible(
+                  flex: deviceSize.width > 600 ? 2 : 1,
+                  child: AuthCard(),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

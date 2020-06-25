@@ -31,7 +31,6 @@ dependencies:
   provider: ^4.0.5+1
   intl: ^0.16.1
   http: ^0.12.1
-  flutter_login: ^1.0.14
   flutter_launcher_icons: ^0.7.5
 
   # The following adds the Cupertino Icons font to your application.
@@ -54,6 +53,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/img/maoproduceLogo.png
+    - assets/img/maoProduceLeaf.png
+    - assets/img/maoProduceText.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see

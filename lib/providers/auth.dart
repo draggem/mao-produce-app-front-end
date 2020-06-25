@@ -33,12 +33,18 @@ class Auth with ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
+      print(e);
       throw e;
     }
   }
 
-  //sign in function
+  //registration function
   Future<void> signup(String email, String password) async {
-    return _authenticate(email, password, 'signup');
+    return _authenticate(email, password, 'signUp');
+  }
+
+  //login function
+  Future<void> signin(String email, String password) async {
+    return _authenticate(email, password, 'signInWithPassword');
   }
 }
