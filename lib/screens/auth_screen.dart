@@ -20,25 +20,24 @@ class AuthScreen extends StatelessWidget {
               color: Colors.green,
             ),
           ),
-          Container(
-            height: deviceSize.height,
-            width: deviceSize.width,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Flexible(
-                  child: Container(
-                    padding: EdgeInsets.all(40),
-                    child:
-                        Image.asset('assets/img/maoProduceLeaf.png', width: 70),
+          SingleChildScrollView(
+            child: Container(
+              height: deviceSize.height,
+              width: deviceSize.width,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Flexible(
+                    child: Container(
+                      padding: EdgeInsets.all(40),
+                      child: Image.asset('assets/img/maoProduceLeaf.png',
+                          width: 70),
+                    ),
                   ),
-                ),
-                Flexible(
-                  flex: deviceSize.width > 600 ? 2 : 1,
-                  child: AuthCard(),
-                )
-              ],
+                  AuthCard(),
+                ],
+              ),
             ),
           ),
         ],

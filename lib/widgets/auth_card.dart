@@ -33,11 +33,6 @@ class _AuthCardState extends State<AuthCard>
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
-  //text form field focus node
-  FocusNode _emailFocusNode = new FocusNode();
-  FocusNode _passFocusNode = new FocusNode();
-  FocusNode _confirmFocusNode = new FocusNode();
-
   AnimationController _controller;
   Animation<Offset> _slideAnimation;
   Animation<double> _opacityAnimation;
@@ -46,9 +41,6 @@ class _AuthCardState extends State<AuthCard>
   @override
   void initState() {
     super.initState();
-    _emailFocusNode = FocusNode();
-    _passFocusNode = FocusNode();
-    _confirmFocusNode = FocusNode();
 
     _controller = AnimationController(
       vsync: this,
@@ -69,10 +61,8 @@ class _AuthCardState extends State<AuthCard>
 
   @override
   void dispose() {
-    _emailFocusNode.dispose();
-    _passFocusNode.dispose();
-    _confirmFocusNode.dispose();
     _controller.dispose();
+
     super.dispose();
   }
 
@@ -188,17 +178,16 @@ class _AuthCardState extends State<AuthCard>
               children: <Widget>[
                 TextFormField(
                   //Email field
-                  focusNode: _emailFocusNode,
                   style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: 'E-mail',
-                    labelStyle: TextStyle(
-                        color: _emailFocusNode.hasFocus
-                            ? Colors.green
-                            : Colors.white),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: new BorderSide(color: Colors.white),
-                    ),
+                    // labelStyle: TextStyle(
+                    //     color: _emailFocusNode.hasFocus
+                    //         ? Colors.green
+                    //         : Colors.white),
+                    // enabledBorder: UnderlineInputBorder(
+                    //   borderSide: new BorderSide(color: Colors.white),
+                    // ),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -214,17 +203,16 @@ class _AuthCardState extends State<AuthCard>
                 ),
                 TextFormField(
                   //Password field
-                  focusNode: _passFocusNode,
                   style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    labelStyle: TextStyle(
-                        color: _passFocusNode.hasFocus
-                            ? Colors.green
-                            : Colors.white),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: new BorderSide(color: Colors.white),
-                    ),
+                    // labelStyle: TextStyle(
+                    //     color: _passFocusNode.hasFocus
+                    //         ? Colors.green
+                    //         : Colors.white),
+                    // enabledBorder: UnderlineInputBorder(
+                    //   borderSide: new BorderSide(color: Colors.white),
+                    // ),
                   ),
                   obscureText: true,
                   controller: _passwordController,
@@ -249,16 +237,10 @@ class _AuthCardState extends State<AuthCard>
                     child: SlideTransition(
                       position: _slideAnimation,
                       child: TextFormField(
+                          style: TextStyle(color: Colors.white),
                           enabled: _authMode == AuthMode.Signup,
                           decoration: InputDecoration(
                             labelText: 'Confirm Password',
-                            labelStyle: TextStyle(
-                                color: _confirmFocusNode.hasFocus
-                                    ? Colors.green
-                                    : Colors.white),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: new BorderSide(color: Colors.white),
-                            ),
                           ),
                           obscureText: true,
                           //Validator only works if the _authMode is Signup

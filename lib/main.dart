@@ -29,6 +29,18 @@ class MyApp extends StatelessWidget {
               textTheme: TextTheme(
                 headline6: TextStyle(color: Colors.white, fontSize: 20),
               ),
+              inputDecorationTheme: InputDecorationTheme(
+                labelStyle: TextStyle(color: Colors.white),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.green),
+                ),
+                border: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+              ),
             ),
             home: auth.isAuth
                 ? MenuScreen()
