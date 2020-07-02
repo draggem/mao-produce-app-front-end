@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import './models/secret.dart';
+
 import './providers/auth.dart';
+import './providers/user_service.dart';
 
 import './screens/auth_screen.dart';
 import './screens/menu_screen.dart';
@@ -18,7 +21,8 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider.value(
           value: Auth(),
-        )
+        ),
+        ChangeNotifierProvider.value(value: UserService(Secret.userPool))
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(

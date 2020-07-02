@@ -1,7 +1,9 @@
+import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/auth.dart';
+// import '../providers/auth.dart';
+import '../providers/user_service.dart';
 
 import '../models/http_exception.dart';
 
@@ -82,16 +84,21 @@ class _AuthCardState extends State<AuthCard>
   }
 
   //show error pop up
-  void _showErrorDialog(String message) {
+  void _showErrorDialog(String message, bool success) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('An Error Occured!'),
+        title: success == false ? Text('An Error Occured!') : Text('Success!'),
         content: Text(message),
         actions: <Widget>[
           FlatButton(
             onPressed: () {
-              Navigator.of(ctx).pop();
+              if (success == true) {
+                Navigator.of(ctx).pop();
+                _switchAuthMode();
+              } else {
+                Navigator.of(ctx).pop();
+              }
             },
             child: Text('Okay'),
           ),
@@ -105,6 +112,7 @@ class _AuthCardState extends State<AuthCard>
   }
 
   Future<void> _submit() async {
+    var success = false;
     if (!_formKey.currentState.validate()) {
       return;
     }
@@ -117,23 +125,32 @@ class _AuthCardState extends State<AuthCard>
     try {
       if (_authMode == AuthMode.Login) {
         //Log user in
-        await Provider.of<Auth>(context, listen: false)
-            .signin(_authData['email'], _authData['password']);
+
+        // await Provider.of<Auth>(context, listen: false)
+        //     .signin(_authData['email'], _authData['password']);
       } else {
         //Sign user up
-        await Provider.of<Auth>(context, listen: false)
-            .signup(_authData['email'], _authData['password']);
+
+        await Provider.of<UserService>(context, listen: false)
+            .signUp(_authData['email'], _authData['password']);
+
+        success = true;
+
+        _showErrorDialog(
+            'An email has been sent to verify your account', success);
       }
       setState(() {
         _isLoading = false;
       });
-    } on HttpException catch (error) {
+    } on CognitoClientException catch (error) {
       var errorMessage = 'Authentication Failed';
+
+      success = false;
 
       //If statements for every error message backend gives
       //This is the front end receiver for the http_exceptions to display in front end
-      if (error.toString().contains('EMAIL_EXISTS')) {
-        errorMessage = 'This email address is already in use';
+      if (error.code == 'UsernameExistsException') {
+        errorMessage = 'This email has already been taken';
       } else if (error.toString().contains('INVALID_EMAIL')) {
         errorMessage = 'This is not a valid email address';
       } else if (error.toString().contains('WEAK_PASSWORD')) {
@@ -144,12 +161,16 @@ class _AuthCardState extends State<AuthCard>
         errorMessage = 'Invalid password.';
       }
 
-      _showErrorDialog(errorMessage);
+      _showErrorDialog(errorMessage, success);
     } catch (error) {
       //error from phone
       const errorMessage =
           'Could not authenticate you. Check your internet conncetion';
-      _showErrorDialog(errorMessage);
+
+      success = false;
+
+      _showErrorDialog(errorMessage, success);
+      print(error.toString());
     }
   }
 

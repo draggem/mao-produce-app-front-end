@@ -33,6 +33,7 @@ dependencies:
   http: ^0.12.1
   flutter_launcher_icons: ^0.7.5
   shared_preferences: ^0.5.7+3
+  amazon_cognito_identity_dart_2: ^0.1.14
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
