@@ -126,8 +126,8 @@ class _AuthCardState extends State<AuthCard>
       if (_authMode == AuthMode.Login) {
         //Log user in
 
-        // await Provider.of<Auth>(context, listen: false)
-        //     .signin(_authData['email'], _authData['password']);
+        await Provider.of<UserService>(context, listen: false)
+            .login(_authData['email'], _authData['password']);
       } else {
         //Sign user up
 
@@ -144,6 +144,7 @@ class _AuthCardState extends State<AuthCard>
       });
     } on CognitoClientException catch (error) {
       var errorMessage = 'Authentication Failed';
+      print(error.toString());
 
       success = false;
 
