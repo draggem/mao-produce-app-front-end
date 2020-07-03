@@ -1,7 +1,6 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 // import '../providers/auth.dart';
 import '../providers/user_service.dart';
 
@@ -161,6 +160,8 @@ class _AuthCardState extends State<AuthCard>
       } else if (error.toString().contains('INVALID_PASSWORD')) {
         errorMessage = 'Invalid password.';
       }
+
+      print(error.toString());
 
       _showErrorDialog(errorMessage, success);
     } catch (error) {
