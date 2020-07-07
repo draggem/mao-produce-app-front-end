@@ -83,7 +83,10 @@ class _AuthCardState extends State<AuthCard>
   }
 
   //show error pop up
-  void _showErrorDialog(String message, bool success) {
+  void _showErrorDialog(
+    String message,
+    bool success,
+  ) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(

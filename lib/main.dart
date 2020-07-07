@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider.value(value: UserService(Secret.userPool))
       ],
-      child: Consumer<Auth>(
+      child: Consumer<UserService>(
         builder: (ctx, auth, _) => MaterialApp(
             title: 'Mao Produce',
             theme: ThemeData(
