@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 // import '../providers/auth.dart';
 import '../providers/user_service.dart';
 
-import '../models/http_exception.dart';
+//import '../models/http_exception.dart';
 
 enum AuthMode {
   Signup,

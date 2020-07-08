@@ -9,7 +9,7 @@ import '../models/user_cognito.dart';
 import './storage.dart';
 
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
-import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
+//import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _identityPoolId = 'ap-southeast-2:546acadb-99c7-485d-b8d4-952d7f1b875c';
@@ -105,6 +105,11 @@ class UserService with ChangeNotifier {
       //once logged in, start timer for token expiry
       _autoLogout();
       notifyListeners();
+
+      if (!_session.isValid()) {
+        return null;
+      }
+
       //define phone memory and the data you want to store inside it
       final prefs = await SharedPreferences.getInstance();
       final userData = json.encode(
@@ -116,7 +121,15 @@ class UserService with ChangeNotifier {
       );
       //store the data inside the phone
       prefs.setString('userData', userData);
-      print("you are logged in");
+
+      print(prefs.getString('userData'));
+      //This is storage memory number 2
+      final attributes = await _cognitoUser.getUserAttributes();
+      final user = User.fromUserAttributes(attributes);
+      user.confirmed = isConfirmed;
+      user.hasAccess = true;
+
+      return user;
     } on CognitoClientException catch (e) {
       if (e.code == 'UserNotConfirmedException') {
         isConfirmed = false;
@@ -125,17 +138,6 @@ class UserService with ChangeNotifier {
       }
       throw e;
     }
-
-    if (!_session.isValid()) {
-      return null;
-    }
-
-    final attributes = await _cognitoUser.getUserAttributes();
-    final user = User.fromUserAttributes(attributes);
-    user.confirmed = isConfirmed;
-    user.hasAccess = true;
-
-    return user;
   }
 
   /// Confirm user's account with confirmation code sent to email
