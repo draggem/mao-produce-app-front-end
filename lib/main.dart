@@ -9,6 +9,7 @@ import './providers/user_service.dart';
 import './screens/auth_screen.dart';
 import './screens/menu_screen.dart';
 import './screens/splash_screen.dart';
+import './screens/customer_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
         builder: (ctx, auth, _) => MaterialApp(
             title: 'Mao Produce',
             theme: ThemeData(
-              primarySwatch: Colors.green,
+              primaryColor: Color.fromRGBO(3, 153, 18, 1),
               accentColor: Colors.greenAccent,
               textTheme: TextTheme(
                 headline6: TextStyle(color: Colors.white, fontSize: 20),
@@ -57,6 +58,7 @@ class MyApp extends StatelessWidget {
                             : AuthScreen()),
             routes: {
               MenuScreen.routeName: (ctx) => MenuScreen(),
+              CustomerScreen.routeName: (ctx) => CustomerScreen(),
             }),
       ),
     );
