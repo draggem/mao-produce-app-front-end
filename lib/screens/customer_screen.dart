@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/customer_https.dart';
 
 import '../widgets/app_drawer.dart';
+import '../widgets/customer_tile.dart';
 
+import '../models/customer_model.dart';
 import '../models/options.dart';
 
 class CustomerScreen extends StatelessWidget {
@@ -10,6 +15,10 @@ class CustomerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //provider for customerData
+    final customerProvider = Provider.of<CustomerHttps>(context);
+    final customerData = customerProvider.items;
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -24,7 +33,16 @@ class CustomerScreen extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: Text('gay'),
+      body: Padding(
+        padding: EdgeInsets.all(5),
+        child: ListView.builder(
+          itemCount: customerData.length,
+          itemBuilder: (_, i) => CustomerTile(
+            customerData[i].id,
+            customerData[i].name,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -82,16 +100,36 @@ class DataSearch extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    // show some result based on the selection
+    return Card(
+      color: Colors.red,
+      child: Center(
+        child: Text(query),
+      ),
+    );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    final customerData = Provider.of<CustomerHttps>(context);
+    final customerList = [];
+    final customerMap = [];
+
+    for (var i = 0; i < customerData.items.length; i++) {
+      var newMap = {
+        'name': customerData.items[i].name,
+        'id': customerData.items[i].id,
+      };
+      customerMap.add(newMap);
+      customerList.add(
+        customerData.items[i].name,
+      );
+    }
+
     final suggestionList = query.isEmpty
         ? recent
-        : CUSTOMERS
+        : customerList
             .where(
-              (input) => input.contains(
+              (input) => input.startsWith(
                 RegExp(query, caseSensitive: false),
               ),
             )
@@ -100,21 +138,23 @@ class DataSearch extends SearchDelegate<String> {
     return ListView.builder(
         itemBuilder: (context, index) => ListTile(
               //Function when data that is searched is tapped
-              onTap: () {},
+              onTap: () {
+                showResults(context);
+              },
               leading: Icon(
                 Icons.perm_identity,
                 color: Theme.of(context).primaryColor,
               ),
               title: RichText(
                 text: TextSpan(
-                  text: suggestionList[index].substring(0, query.length),
+                  text: customerMap[index]['name'].substring(0, query.length),
                   style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
                   children: [
                     TextSpan(
-                      text: suggestionList[index].substring(query.length),
+                      text: customerMap[index]['name'].substring(query.length),
                       style: TextStyle(color: Colors.grey),
                     )
                   ],

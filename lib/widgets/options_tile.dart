@@ -9,7 +9,7 @@ class OptionsTile extends StatelessWidget {
   OptionsTile(this.routeName, this.title, this.color, this.icon);
 
   void _selectTile(BuildContext ctx, String routeName) {
-    Navigator.of(ctx).pushReplacementNamed(routeName, arguments: title);
+    Navigator.of(ctx).pushReplacementNamed(routeName);
   }
 
   @override

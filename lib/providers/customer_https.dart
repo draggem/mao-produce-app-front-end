@@ -64,4 +64,17 @@ class CustomerHttps with ChangeNotifier {
         phone: 123456789,
         address: '295 Blenheim Rd, Upper Riccarton, Christchurch'),
   ];
+
+  List<CustomerModel> get items {
+    return [..._items];
+  }
+
+  //function that finds customers by id
+  CustomerModel findById(String id) {
+    return _items.firstWhere((customer) => customer.id == id);
+  }
+
+  //Customer Get Response
+  Future<void> fetchAndSetCustomers(
+      [bool filterByUser = false, String customerId]) async {}
 }

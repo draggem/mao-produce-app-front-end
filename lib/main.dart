@@ -5,6 +5,7 @@ import './models/secret.dart';
 
 import './providers/auth.dart';
 import './providers/user_service.dart';
+import './providers/customer_https.dart';
 
 import './screens/auth_screen.dart';
 import './screens/menu_screen.dart';
@@ -20,6 +21,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(
+          value: CustomerHttps(),
+        ),
         ChangeNotifierProvider.value(
           value: Auth(),
         ),
