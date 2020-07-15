@@ -29,7 +29,9 @@ class CustomerTile extends StatelessWidget {
         alignment: AlignmentDirectional.centerEnd,
       ),
       key: Key(id),
-      onDismissed: (direction) {},
+      onDismissed: (direction) {
+        print(id);
+      },
     );
   }
 }

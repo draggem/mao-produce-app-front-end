@@ -63,6 +63,12 @@ class CustomerHttps with ChangeNotifier {
         email: 'test@test.com',
         phone: 123456789,
         address: '295 Blenheim Rd, Upper Riccarton, Christchurch'),
+    CustomerModel(
+        id: 'p10',
+        name: 'Orange House',
+        email: 'test@test.com',
+        phone: 123456789,
+        address: '295 Blenheim Rd, Upper Riccarton, Christchurch'),
   ];
 
   List<CustomerModel> get items {
@@ -72,6 +78,11 @@ class CustomerHttps with ChangeNotifier {
   //function that finds customers by id
   CustomerModel findById(String id) {
     return _items.firstWhere((customer) => customer.id == id);
+  }
+
+  List<CustomerModel> findByName(String name) {
+    final gay = _items.where((customer) => customer.name == name);
+    return gay.toList();
   }
 
   //Customer Get Response

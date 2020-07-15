@@ -6,13 +6,17 @@ import '../providers/customer_https.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/customer_tile.dart';
 
-import '../models/customer_model.dart';
-import '../models/options.dart';
+import '../screens/searched_customer_screen.dart';
 
-class CustomerScreen extends StatelessWidget {
+class CustomerScreen extends StatefulWidget {
   //route name
   static const routeName = '/customer';
 
+  @override
+  _CustomerScreenState createState() => _CustomerScreenState();
+}
+
+class _CustomerScreenState extends State<CustomerScreen> {
   @override
   Widget build(BuildContext context) {
     //provider for customerData
@@ -25,7 +29,7 @@ class CustomerScreen extends StatelessWidget {
         title: Text('Customers'),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: Icon(Icons.search),
             onPressed: () {
               showSearch(context: context, delegate: DataSearch());
             },
@@ -99,27 +103,14 @@ class DataSearch extends SearchDelegate<String> {
   }
 
   @override
-  Widget buildResults(BuildContext context) {
-    return Card(
-      color: Colors.red,
-      child: Center(
-        child: Text(query),
-      ),
-    );
-  }
+  Widget buildResults(BuildContext context) {}
 
   @override
   Widget buildSuggestions(BuildContext context) {
     final customerData = Provider.of<CustomerHttps>(context);
     final customerList = [];
-    final customerMap = [];
 
     for (var i = 0; i < customerData.items.length; i++) {
-      var newMap = {
-        'name': customerData.items[i].name,
-        'id': customerData.items[i].id,
-      };
-      customerMap.add(newMap);
       customerList.add(
         customerData.items[i].name,
       );
@@ -139,7 +130,9 @@ class DataSearch extends SearchDelegate<String> {
         itemBuilder: (context, index) => ListTile(
               //Function when data that is searched is tapped
               onTap: () {
-                showResults(context);
+                Navigator.of(context).pushNamed(
+                    SearchedCustomerScreen.routeName,
+                    arguments: suggestionList[index]);
               },
               leading: Icon(
                 Icons.perm_identity,
@@ -147,14 +140,14 @@ class DataSearch extends SearchDelegate<String> {
               ),
               title: RichText(
                 text: TextSpan(
-                  text: customerMap[index]['name'].substring(0, query.length),
+                  text: suggestionList[index].substring(0, query.length),
                   style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
                   children: [
                     TextSpan(
-                      text: customerMap[index]['name'].substring(query.length),
+                      text: suggestionList[index].substring(query.length),
                       style: TextStyle(color: Colors.grey),
                     )
                   ],
