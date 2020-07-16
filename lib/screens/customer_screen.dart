@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mao_produce/screens/edit_customer_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/customer_https.dart';
@@ -8,21 +9,17 @@ import '../widgets/customer_tile.dart';
 
 import '../screens/searched_customer_screen.dart';
 
-class CustomerScreen extends StatefulWidget {
+class CustomerScreen extends StatelessWidget {
   //route name
   static const routeName = '/customer';
 
-  @override
-  _CustomerScreenState createState() => _CustomerScreenState();
-}
+  Future<void> _refreshCustomers(BuildContext context) async {
+    await Provider.of<CustomerHttps>(context, listen: false)
+        .fetchAndSetCustomers();
+  }
 
-class _CustomerScreenState extends State<CustomerScreen> {
   @override
   Widget build(BuildContext context) {
-    //provider for customerData
-    final customerProvider = Provider.of<CustomerHttps>(context);
-    final customerData = customerProvider.items;
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -37,15 +34,33 @@ class _CustomerScreenState extends State<CustomerScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: Padding(
-        padding: EdgeInsets.all(5),
-        child: ListView.builder(
-          itemCount: customerData.length,
-          itemBuilder: (_, i) => CustomerTile(
-            customerData[i].id,
-            customerData[i].name,
-          ),
-        ),
+      body: FutureBuilder(
+        future: _refreshCustomers(context),
+        builder: (ctx, snapshot) =>
+            snapshot.connectionState == ConnectionState.waiting
+                ? Center(child: CircularProgressIndicator())
+                : RefreshIndicator(
+                    onRefresh: () => _refreshCustomers(context),
+                    child: Consumer<CustomerHttps>(
+                      builder: (ctx, customerData, _) => Padding(
+                        padding: EdgeInsets.all(5),
+                        child: ListView.builder(
+                          itemCount: customerData.items.length,
+                          itemBuilder: (_, i) => CustomerTile(
+                            customerData.items[i].id,
+                            customerData.items[i].name,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed(EditCustomerScreen.routeName);
+        },
+        child: Icon(Icons.add, color: Colors.white),
+        backgroundColor: Colors.green,
       ),
     );
   }
@@ -53,12 +68,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
 
 //-------------------------------SearchBar Class-------------------------------------------------------------
 class DataSearch extends SearchDelegate<String> {
-  final recent = [
-    'George Somoso',
-    'Vincent Chen',
-    'Vaughn Gigataras',
-    'Hsin-Chen Tsai',
-  ];
+  var recent = [];
 
   ThemeData appBarTheme(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -102,8 +112,64 @@ class DataSearch extends SearchDelegate<String> {
     );
   }
 
+//When search is entered on keyboard
   @override
-  Widget buildResults(BuildContext context) {}
+  Widget buildResults(BuildContext context) {
+    print(recent);
+    final customerData = Provider.of<CustomerHttps>(context).findByName(query);
+    final customerList = [];
+
+    for (var i = 0; i < customerData.length; i++) {
+      customerList.add(
+        customerData[i].name,
+      );
+    }
+
+    if (query.contains('S')) {
+      print('Hello');
+    }
+
+    final suggestionList = query.isEmpty
+        ? recent
+        : customerList
+            .where(
+              (input) => input.indexOf(query),
+            )
+            .toList();
+
+    return ListView.builder(
+        itemBuilder: (context, index) => ListTile(
+              //Function when data that is searched is tapped
+              onTap: () {
+                Navigator.of(context).pushNamed(
+                    SearchedCustomerScreen.routeName,
+                    arguments: suggestionList[index]);
+                recent.add(suggestionList[index]);
+              },
+              leading: Icon(
+                Icons.perm_identity,
+                color: Theme.of(context).primaryColor,
+              ),
+              title: RichText(
+                text: TextSpan(
+                  text: suggestionList[index].substring(0, query.length),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: suggestionList[index].substring(query.length),
+                      style: TextStyle(color: Colors.grey),
+                    )
+                  ],
+                ),
+              ),
+            ),
+        itemCount: suggestionList.length);
+  }
+
+  //shows the suggestions based from what you typed on the search field
 
   @override
   Widget buildSuggestions(BuildContext context) {
@@ -133,6 +199,7 @@ class DataSearch extends SearchDelegate<String> {
                 Navigator.of(context).pushNamed(
                     SearchedCustomerScreen.routeName,
                     arguments: suggestionList[index]);
+                recent.add(suggestionList[index]);
               },
               leading: Icon(
                 Icons.perm_identity,

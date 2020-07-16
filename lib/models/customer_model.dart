@@ -6,6 +6,7 @@ class CustomerModel {
   final String email;
   final int phone;
   final String address;
+  DateTime userDate;
 
   CustomerModel({
     @required this.id,
@@ -13,5 +14,6 @@ class CustomerModel {
     @required this.email,
     this.phone,
     this.address,
+    this.userDate,
   });
 }

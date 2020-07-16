@@ -30,12 +30,6 @@ class _SearchedCustomerScreenState extends State<SearchedCustomerScreen> {
           'Results for $customerName',
           overflow: TextOverflow.fade,
         ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {},
-          )
-        ],
       ),
       body: Padding(
         padding: EdgeInsets.all(5),
