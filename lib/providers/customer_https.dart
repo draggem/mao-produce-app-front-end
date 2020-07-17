@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 
 import '../models/customer_model.dart';
 import '../models/http_exception.dart';
@@ -80,9 +79,24 @@ class CustomerHttps with ChangeNotifier {
     return _items.firstWhere((customer) => customer.id == id);
   }
 
+//function to find name for search bars
   List<CustomerModel> findByName(String name) {
-    final searchedCustomer = _items.where((customer) => customer.name == name);
-    return searchedCustomer.toList();
+    final List<CustomerModel> customerList = [];
+    _items.forEach(
+      (customer) {
+        String custName = customer.name;
+        if (custName.contains(name)) {
+          customerList.add(
+            CustomerModel(
+              name: custName,
+              id: customer.id,
+              email: customer.email,
+            ),
+          );
+        }
+      },
+    );
+    return customerList;
   }
 
   //Customer Get Response
@@ -156,5 +170,24 @@ class CustomerHttps with ChangeNotifier {
     } catch (error) {
       throw error;
     }
+  }
+
+  //Delete a customer
+  Future<void> deleteCustomer(String id) async {
+    final url =
+        'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/$id';
+    final existingCustomerIndex =
+        _items.indexWhere((customer) => customer.id == id);
+    var existingCustomer = _items[existingCustomerIndex];
+    notifyListeners();
+
+    final response = await http.delete(url);
+
+    if (response.statusCode >= 400) {
+      _items.insert(existingCustomerIndex, existingCustomer);
+      notifyListeners();
+      throw HttpException('Could not delete product.');
+    }
+    existingCustomer = null;
   }
 }

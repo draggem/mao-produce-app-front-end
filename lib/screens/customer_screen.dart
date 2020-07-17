@@ -3,6 +3,7 @@ import 'package:mao_produce/screens/edit_customer_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/customer_https.dart';
+import '../providers/recent_searches.dart';
 
 import '../widgets/app_drawer.dart';
 import '../widgets/customer_tile.dart';
@@ -69,7 +70,6 @@ class CustomerScreen extends StatelessWidget {
 //-------------------------------SearchBar Class-------------------------------------------------------------
 class DataSearch extends SearchDelegate<String> {
   var recent = [];
-
   ThemeData appBarTheme(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return theme.copyWith(
@@ -115,7 +115,8 @@ class DataSearch extends SearchDelegate<String> {
 //When search is entered on keyboard
   @override
   Widget buildResults(BuildContext context) {
-    print(recent);
+    final recentSearchProvider = Provider.of<RecentSearches>(context);
+    recent = recentSearchProvider.recentCustomers;
     final customerData = Provider.of<CustomerHttps>(context).findByName(query);
     final customerList = [];
 
@@ -125,15 +126,13 @@ class DataSearch extends SearchDelegate<String> {
       );
     }
 
-    if (query.contains('S')) {
-      print('Hello');
-    }
-
     final suggestionList = query.isEmpty
         ? recent
         : customerList
             .where(
-              (input) => input.indexOf(query),
+              (input) => input.contains(
+                RegExp(query, caseSensitive: false),
+              ),
             )
             .toList();
 
@@ -144,7 +143,7 @@ class DataSearch extends SearchDelegate<String> {
                 Navigator.of(context).pushNamed(
                     SearchedCustomerScreen.routeName,
                     arguments: suggestionList[index]);
-                recent.add(suggestionList[index]);
+                recentSearchProvider.addRecent(suggestionList[index]);
               },
               leading: Icon(
                 Icons.perm_identity,
@@ -173,6 +172,8 @@ class DataSearch extends SearchDelegate<String> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    final recentSearchProvider = Provider.of<RecentSearches>(context);
+    recent = recentSearchProvider.recentCustomers;
     final customerData = Provider.of<CustomerHttps>(context);
     final customerList = [];
 
@@ -186,7 +187,7 @@ class DataSearch extends SearchDelegate<String> {
         ? recent
         : customerList
             .where(
-              (input) => input.startsWith(
+              (input) => input.contains(
                 RegExp(query, caseSensitive: false),
               ),
             )
@@ -194,33 +195,20 @@ class DataSearch extends SearchDelegate<String> {
 
     return ListView.builder(
         itemBuilder: (context, index) => ListTile(
-              //Function when data that is searched is tapped
-              onTap: () {
-                Navigator.of(context).pushNamed(
-                    SearchedCustomerScreen.routeName,
-                    arguments: suggestionList[index]);
-                recent.add(suggestionList[index]);
-              },
-              leading: Icon(
-                Icons.perm_identity,
-                color: Theme.of(context).primaryColor,
-              ),
-              title: RichText(
-                text: TextSpan(
-                  text: suggestionList[index].substring(0, query.length),
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: suggestionList[index].substring(query.length),
-                      style: TextStyle(color: Colors.grey),
-                    )
-                  ],
-                ),
-              ),
+            //Function when data that is searched is tapped
+            onTap: () {
+              Navigator.of(context).pushNamed(SearchedCustomerScreen.routeName,
+                  arguments: suggestionList[index]);
+              recentSearchProvider.addRecent(suggestionList[index]);
+            },
+            leading: Icon(
+              Icons.perm_identity,
+              color: Theme.of(context).primaryColor,
             ),
+            title: Text(
+              suggestionList[index],
+              style: TextStyle(color: Theme.of(context).primaryColor),
+            )),
         itemCount: suggestionList.length);
   }
 }
