@@ -12,13 +12,13 @@ class CustomerHttps with ChangeNotifier {
         id: 'p1',
         name: 'Vaughn Gigataras',
         email: 'test@test.com',
-        phone: 123456789,
+        phone: '123456789',
         address: '295 Blenheim Rd, Upper Riccarton, Christchurch'),
     CustomerModel(
         id: 'p2',
         name: 'Vincent Chen',
         email: 'test@test.com',
-        phone: 123456789,
+        phone: '123456789',
         address: '295 Blenheim Rd, Upper Riccarton, Christchurch'),
     // CustomerModel(
     //     id: 'p3',
@@ -102,7 +102,8 @@ class CustomerHttps with ChangeNotifier {
   //Customer Get Response
   Future<void> fetchAndSetCustomers() async {
     var url =
-        'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod';
+        'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Customers';
+    print('hello');
     try {
       final response = await http.get(url);
 
@@ -114,23 +115,26 @@ class CustomerHttps with ChangeNotifier {
       }
 
       for (var i = 0; i < extractedData.length; i++) {
-        loadedCustomers.add(
-          CustomerModel(
-            id: extractedData[i]['id'],
-            name: extractedData[i]['name'],
-            email: extractedData[i]['email'],
-            address: extractedData[i]['address'],
-            phone: extractedData[i]['phone'],
-            userDate: DateTime.parse(
-              extractedData[i]['createdtimestamp'],
+        if (extractedData[i]['name'] != null) {
+          loadedCustomers.add(
+            CustomerModel(
+              id: extractedData[i]['id'],
+              name: extractedData[i]['name'],
+              email: extractedData[i]['email'],
+              address: extractedData[i]['address'],
+              phone: extractedData[i]['phonenumber'],
+              userDate: DateTime.parse(
+                extractedData[i]['createdtimestamp'],
+              ),
             ),
-          ),
-        );
+          );
+        }
       }
 
       _items = loadedCustomers;
       notifyListeners();
     } catch (e) {
+      print(e);
       throw (e);
     }
   }
@@ -138,7 +142,7 @@ class CustomerHttps with ChangeNotifier {
   //Adding customer
   Future<void> addCustomers(CustomerModel customer) async {
     var url =
-        'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod';
+        'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Customers';
     try {
       final response = await http.put(
         url,
@@ -148,7 +152,7 @@ class CustomerHttps with ChangeNotifier {
             'name': customer.name,
             'email': customer.email,
             'address': customer.address,
-            'phone': customer.phone.toString(),
+            'phonenumber': customer.phone.toString(),
             'createdtimestamp': DateTime.now().toString(),
           },
         ),
@@ -175,7 +179,7 @@ class CustomerHttps with ChangeNotifier {
   //Delete a customer
   Future<void> deleteCustomer(String id) async {
     final url =
-        'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/$id';
+        'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Customers/$id';
     final existingCustomerIndex =
         _items.indexWhere((customer) => customer.id == id);
     var existingCustomer = _items[existingCustomerIndex];
@@ -189,5 +193,33 @@ class CustomerHttps with ChangeNotifier {
       throw HttpException('Could not delete product.');
     }
     existingCustomer = null;
+  }
+
+  //Editing a Customer
+  Future<void> updateCustomer(String id, CustomerModel newCustomer) async {
+    try {
+      final customerIndex = _items.indexWhere((cust) => cust.id == id);
+
+      if (customerIndex >= 0) {
+        final url =
+            'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Customers/$id';
+
+        final response = await http.patch(url,
+            headers: {"Content-Type": "application/json"},
+            body: json.encode({
+              'id': newCustomer.id,
+              'name': newCustomer.name,
+              'email': newCustomer.email,
+              'address': newCustomer.address,
+              'phonenumber': newCustomer.phone,
+              'createdtimestamp': _items[customerIndex].userDate.toString(),
+            }));
+        print(json.decode(response.body));
+        _items[customerIndex] = newCustomer;
+      }
+    } catch (e) {
+      print(e);
+      throw (e);
+    }
   }
 }

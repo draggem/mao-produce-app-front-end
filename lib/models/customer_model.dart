@@ -4,7 +4,7 @@ class CustomerModel {
   final String id;
   final String name;
   final String email;
-  final int phone;
+  final String phone;
   final String address;
   DateTime userDate;
 

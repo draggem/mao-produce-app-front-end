@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mao_produce/screens/customer_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 import '../models/customer_model.dart';
 
@@ -26,7 +27,8 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
     name: '',
     email: '',
     address: '',
-    phone: null,
+    phone: '',
+    userDate: DateTime.now(),
   );
 
   var _initValues = {
@@ -34,7 +36,9 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
     'name': '',
     'email': '',
     'address': '',
-    'phone': null,
+    'phone': '',
+    'createdTimeStamp':
+        DateFormat.yMMMMEEEEd().format(DateTime.now()).toString(),
   };
 
   var _isInit = true;
@@ -54,17 +58,19 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
     if (_isInit) {
       final customerId = ModalRoute.of(context).settings.arguments as String;
       if (customerId != null) {
-        final _editedCustomer =
-            Provider.of<CustomerHttps>(context, listen: false)
-                .findById(customerId);
-        title = 'Edit ${_editedCustomer.name}';
+        _editedCustomer = Provider.of<CustomerHttps>(context, listen: false)
+            .findById(customerId);
 
+        title = 'Edit ${_editedCustomer.name}';
         _initValues = {
           'id': _editedCustomer.id,
           'name': _editedCustomer.name,
           'email': _editedCustomer.email,
           'address': _editedCustomer.address,
-          'phone': _editedCustomer.phone.toString(),
+          'phone': _editedCustomer.phone,
+          'createdTimeStamp': DateFormat.yMMMMEEEEd()
+              .format(_editedCustomer.userDate)
+              .toString(),
         };
       }
     }
@@ -86,7 +92,20 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
     _form.currentState.save();
 
     if (_editedCustomer.id != null) {
-      return;
+      try {
+        await Provider.of<CustomerHttps>(context, listen: false)
+            .updateCustomer(_editedCustomer.id, _editedCustomer);
+      } catch (error) {
+        setState(() {
+          _isLoading = false;
+        });
+        _showErrorDialog(error.toString());
+        return;
+      }
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.of(context).pushNamed(CustomerScreen.routeName);
     } else {
       try {
         await Provider.of<CustomerHttps>(context, listen: false)
@@ -109,16 +128,17 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-          title: Text('An Error Occured!'),
-          content: Text(message),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Okay'),
-              onPressed: () {
-                Navigator.of(ctx).pop();
-              },
-            )
-          ]),
+        title: Text('An Error Occured!'),
+        content: Text(message),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Okay'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
     );
   }
 
@@ -185,7 +205,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
                         );
                       },
                     ),
-                    SizedBox(height: 50),
+                    SizedBox(height: 40),
                     TextFormField(
                       initialValue: _initValues['email'],
                       decoration: InputDecoration(
@@ -220,7 +240,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
                         );
                       },
                     ),
-                    SizedBox(height: 50),
+                    SizedBox(height: 40),
                     TextFormField(
                       initialValue: _initValues['address'],
                       decoration: InputDecoration(
@@ -246,7 +266,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
                         );
                       },
                     ),
-                    SizedBox(height: 50),
+                    SizedBox(height: 40),
                     TextFormField(
                       initialValue: _initValues['phone'],
                       decoration: InputDecoration(
@@ -275,9 +295,22 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
                           name: _editedCustomer.name,
                           email: _editedCustomer.email,
                           address: _editedCustomer.address,
-                          phone: int.parse(value),
+                          phone: value,
                         );
                       },
+                    ),
+                    SizedBox(height: 40),
+                    TextFormField(
+                      initialValue: _initValues['createdTimeStamp'].toString(),
+                      enabled: false,
+                      decoration: InputDecoration(
+                        labelText: 'User date created on',
+                        labelStyle: TextStyle(color: Colors.black),
+                        icon: Icon(Icons.timer),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                      ),
                     ),
                   ],
                 ),

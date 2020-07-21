@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/services.dart';
 import 'package:vibration/vibration.dart';
 
 import '../screens/edit_customer_screen.dart';
@@ -13,10 +12,10 @@ class CustomerTile extends StatefulWidget {
   final String id;
   final String name;
 
-  CustomerTile(
+  CustomerTile({
     this.id,
     this.name,
-  );
+  });
 
   @override
   _CustomerTileState createState() => _CustomerTileState();
@@ -28,6 +27,7 @@ class _CustomerTileState extends State<CustomerTile> {
     final scaffold = Scaffold.of(context);
 
     void _confirmDelete() {
+      Vibration.vibrate(duration: 500);
       var _isLoading = false;
       showDialog(
         barrierDismissible: false,
@@ -37,8 +37,13 @@ class _CustomerTileState extends State<CustomerTile> {
             builder: (context, setState) {
               return AlertDialog(
                 elevation: 0,
-                title: _isLoading ? Text('') : Text('Warning'),
-                backgroundColor: _isLoading ? Colors.transparent : Colors.white,
+                title: _isLoading
+                    ? Text('')
+                    : Text(
+                        'Warning',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                backgroundColor: _isLoading ? Colors.transparent : Colors.red,
                 content: _isLoading
                     ? Center(
                         child: SizedBox(
@@ -49,17 +54,56 @@ class _CustomerTileState extends State<CustomerTile> {
                           ),
                         ),
                       )
-                    : Text('Are you sure you want to remove this customer?'),
+                    : Text('Are you sure you want to remove this customer?',
+                        style: TextStyle(color: Colors.white)),
                 actions: <Widget>[
                   FlatButton(
-                      child: _isLoading ? Text('') : Text('Delete'),
-                      onPressed: () {
+                      child: _isLoading
+                          ? Text('')
+                          : Text(
+                              'Delete',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                      onPressed: () async {
                         setState(() {
                           _isLoading = true;
                         });
+                        try {
+                          await Provider.of<CustomerHttps>(context,
+                                  listen: false)
+                              .deleteCustomer(widget.id);
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          Navigator.of(context).pop();
+                          Navigator.of(context)
+                              .pushNamed(CustomerScreen.routeName);
+                        } catch (e) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+
+                          Navigator.of(context).pop();
+
+                          scaffold.showSnackBar(SnackBar(
+                            content: Text(
+                              'Deleting Failed!',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.red,
+                          ));
+                        }
                       }),
                   FlatButton(
-                    child: Text('Cancel'),
+                    child: _isLoading
+                        ? Text('')
+                        : Text(
+                            'Cancel',
+                            style: TextStyle(color: Colors.white),
+                          ),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -84,7 +128,11 @@ class _CustomerTileState extends State<CustomerTile> {
             child: Text('${widget.name[0]}'),
             foregroundColor: Colors.white,
           ),
-          title: Center(child: Text(widget.name)),
+          title: Center(
+            child: Text(
+              widget.name,
+            ),
+          ),
         ),
       ),
       secondaryActions: <Widget>[
@@ -108,28 +156,3 @@ class _CustomerTileState extends State<CustomerTile> {
     );
   }
 }
-
-// try {
-//   await Provider.of<CustomerHttps>(context, listen: false)
-//       .deleteCustomer(widget.id);
-// } catch (error) {
-//   setState(() {
-//     _isLoading = false;
-//   });
-//   Navigator.of(ctx).pop();
-//   scaffold.showSnackBar(
-//     SnackBar(
-//       backgroundColor: Colors.red,
-//       content: Text(
-//         'Deleting Failed',
-//         textAlign: TextAlign.center,
-//         style: TextStyle(color: Colors.white),
-//       ),
-//     ),
-//   );
-// }
-// setState(() {
-//   _isLoading = false;
-// });
-// Navigator.of(ctx)
-//     .pushReplacementNamed(CustomerScreen.routeName);

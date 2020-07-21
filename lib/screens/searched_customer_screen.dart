@@ -36,8 +36,8 @@ class _SearchedCustomerScreenState extends State<SearchedCustomerScreen> {
         child: ListView.builder(
           itemCount: customerData.length,
           itemBuilder: (_, i) => CustomerTile(
-            customerData[i].id,
-            customerData[i].name,
+            id: customerData[i].id,
+            name: customerData[i].name,
           ),
         ),
       ),

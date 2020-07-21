@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mao_produce/screens/product_screen.dart';
 
 import '../screens/customer_screen.dart';
+
+import './custom_icons_icons.dart';
 
 import 'menu_options.dart';
 
@@ -16,8 +19,14 @@ const OPTIONS = const [
     routeName: null,
     title: 'Orders',
     icon: Icons.assignment,
-    color: Color.fromRGBO(3, 153, 18, 1),
-  )
+    color: Colors.blue,
+  ),
+  MenuOptions(
+    routeName: ProductScreen.routeName,
+    title: 'Vegetables',
+    icon: CustomIcons.leaf,
+    color: Colors.orange,
+  ),
 ];
 
 //HardCoded data for front end testing

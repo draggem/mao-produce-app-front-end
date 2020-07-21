@@ -15,8 +15,30 @@ class CustomerScreen extends StatelessWidget {
   static const routeName = '/customer';
 
   Future<void> _refreshCustomers(BuildContext context) async {
-    await Provider.of<CustomerHttps>(context, listen: false)
-        .fetchAndSetCustomers();
+    try {
+      await Provider.of<CustomerHttps>(context, listen: false)
+          .fetchAndSetCustomers();
+    } catch (e) {
+      _showErrorDialog(context, e.toString());
+    }
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('An Error Occured!'),
+        content: Text(message),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Okay'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
   }
 
   @override
@@ -48,8 +70,8 @@ class CustomerScreen extends StatelessWidget {
                         child: ListView.builder(
                           itemCount: customerData.items.length,
                           itemBuilder: (_, i) => CustomerTile(
-                            customerData.items[i].id,
-                            customerData.items[i].name,
+                            id: customerData.items[i].id,
+                            name: customerData.items[i].name,
                           ),
                         ),
                       ),

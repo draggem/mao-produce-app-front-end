@@ -14,6 +14,7 @@ import './screens/splash_screen.dart';
 import './screens/customer_screen.dart';
 import './screens/searched_customer_screen.dart';
 import './screens/edit_customer_screen.dart';
+import './screens/product_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -72,7 +73,8 @@ class MyApp extends StatelessWidget {
             MenuScreen.routeName: (ctx) => MenuScreen(),
             CustomerScreen.routeName: (ctx) => CustomerScreen(),
             SearchedCustomerScreen.routeName: (ctx) => SearchedCustomerScreen(),
-            EditCustomerScreen.routeName: (ctx) => EditCustomerScreen()
+            EditCustomerScreen.routeName: (ctx) => EditCustomerScreen(),
+            ProductScreen.routeName: (ctx) => ProductScreen()
           },
         ),
       ),
