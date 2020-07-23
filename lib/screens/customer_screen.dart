@@ -8,7 +8,7 @@ import '../providers/recent_searches.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/customer_tile.dart';
 
-import '../screens/searched_customer_screen.dart';
+import 'searched_item_screen.dart';
 
 class CustomerScreen extends StatelessWidget {
   //route name
@@ -83,7 +83,7 @@ class CustomerScreen extends StatelessWidget {
           Navigator.of(context).pushNamed(EditCustomerScreen.routeName);
         },
         child: Icon(Icons.add, color: Colors.white),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.lightGreen[800],
       ),
     );
   }
@@ -162,9 +162,9 @@ class DataSearch extends SearchDelegate<String> {
         itemBuilder: (context, index) => ListTile(
               //Function when data that is searched is tapped
               onTap: () {
-                Navigator.of(context).pushNamed(
-                    SearchedCustomerScreen.routeName,
-                    arguments: suggestionList[index]);
+                final searchedData = [suggestionList[index], 'customer'];
+                Navigator.of(context).pushNamed(SearchedItemScreen.routeName,
+                    arguments: searchedData);
                 recentSearchProvider.addRecent(suggestionList[index]);
               },
               leading: Icon(
@@ -219,8 +219,9 @@ class DataSearch extends SearchDelegate<String> {
         itemBuilder: (context, index) => ListTile(
             //Function when data that is searched is tapped
             onTap: () {
-              Navigator.of(context).pushNamed(SearchedCustomerScreen.routeName,
-                  arguments: suggestionList[index]);
+              final searchedData = [suggestionList[index], 'customer'];
+              Navigator.of(context).pushNamed(SearchedItemScreen.routeName,
+                  arguments: searchedData);
               recentSearchProvider.addRecent(suggestionList[index]);
             },
             leading: Icon(

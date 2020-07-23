@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:mao_produce/screens/customer_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 import '../models/customer_model.dart';
 
 import '../providers/customer_https.dart';
+
+import '../screens/customer_screen.dart';
 
 class EditCustomerScreen extends StatefulWidget {
   static const routeName = '/edit-customer';

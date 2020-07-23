@@ -7,14 +7,16 @@ import './providers/auth.dart';
 import './providers/user_service.dart';
 import './providers/customer_https.dart';
 import './providers/recent_searches.dart';
+import './providers/product_https.dart';
 
 import './screens/auth_screen.dart';
 import './screens/menu_screen.dart';
 import './screens/splash_screen.dart';
 import './screens/customer_screen.dart';
-import './screens/searched_customer_screen.dart';
+import './screens/searched_item_screen.dart';
 import './screens/edit_customer_screen.dart';
 import './screens/product_screen.dart';
+import './screens/edit_product_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -37,6 +39,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(
           value: RecentSearches(),
         ),
+        ChangeNotifierProvider.value(
+          value: ProductHttps(),
+        )
       ],
       child: Consumer<UserService>(
         builder: (ctx, auth, _) => MaterialApp(
@@ -72,9 +77,10 @@ class MyApp extends StatelessWidget {
           routes: {
             MenuScreen.routeName: (ctx) => MenuScreen(),
             CustomerScreen.routeName: (ctx) => CustomerScreen(),
-            SearchedCustomerScreen.routeName: (ctx) => SearchedCustomerScreen(),
+            SearchedItemScreen.routeName: (ctx) => SearchedItemScreen(),
             EditCustomerScreen.routeName: (ctx) => EditCustomerScreen(),
-            ProductScreen.routeName: (ctx) => ProductScreen()
+            ProductScreen.routeName: (ctx) => ProductScreen(),
+            EditProductScreen.routeName: (ctx) => EditProductScreen(),
           },
         ),
       ),

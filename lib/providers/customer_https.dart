@@ -85,7 +85,7 @@ class CustomerHttps with ChangeNotifier {
     _items.forEach(
       (customer) {
         String custName = customer.name;
-        if (custName.contains(name)) {
+        if (name.contains(custName)) {
           customerList.add(
             CustomerModel(
               name: custName,
@@ -103,7 +103,6 @@ class CustomerHttps with ChangeNotifier {
   Future<void> fetchAndSetCustomers() async {
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Customers';
-    print('hello');
     try {
       final response = await http.get(url);
 
