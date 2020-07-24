@@ -11,7 +11,7 @@
 ///      fonts:
 ///       - asset: fonts/CustomIcons.ttf
 ///
-/// 
+///
 /// * Font Awesome 4, Copyright (C) 2016 by Dave Gandy
 ///         Author:    Dave Gandy
 ///         License:   SIL ()
@@ -29,7 +29,14 @@ class CustomIcons {
   static const _kFontFam = 'CustomIcons';
   static const _kFontPkg = null;
 
-  static const IconData leaf = IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData leaf_2 = IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData leaf_1 = IconData(0xe8ba, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData leaf =
+      IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData leaf_2 =
+      IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData tag =
+      IconData(0xe802, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData leaf_3 =
+      IconData(0xe849, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData leaf_1 =
+      IconData(0xe8ba, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

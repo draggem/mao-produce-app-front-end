@@ -3,6 +3,11 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:vibration/vibration.dart';
 
+import '../screens/edit_product_screen.dart';
+import '../screens/product_screen.dart';
+
+import '../providers/product_https.dart';
+
 class ProductTile extends StatefulWidget {
   final String id;
   final String title;
@@ -70,15 +75,15 @@ class _ProductTileState extends State<ProductTile> {
                           _isLoading = true;
                         });
                         try {
-                          // await Provider.of<CustomerHttps>(context,
-                          //         listen: false)
-                          //     .deleteCustomer(widget.id);
-                          // setState(() {
-                          //   _isLoading = false;
-                          // });
-                          // Navigator.of(context).pop();
-                          // Navigator.of(context)
-                          //     .pushNamed(CustomerScreen.routeName);
+                          await Provider.of<ProductHttps>(context,
+                                  listen: false)
+                              .deleteProduct(widget.id);
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          Navigator.of(context).pop();
+                          Navigator.of(context)
+                              .pushNamed(ProductScreen.routeName);
                         } catch (e) {
                           setState(() {
                             _isLoading = false;
@@ -140,7 +145,10 @@ class _ProductTileState extends State<ProductTile> {
           caption: 'Edit',
           color: Colors.orange,
           icon: Icons.edit,
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context)
+                .pushNamed(EditProductScreen.routeName, arguments: widget.id);
+          },
         ),
         IconSlideAction(
           caption: 'Delete',

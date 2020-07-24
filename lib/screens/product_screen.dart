@@ -8,6 +8,7 @@ import '../providers/product_https.dart';
 import '../providers/recent_searches.dart';
 
 import '../screens/searched_item_screen.dart';
+import '../screens/edit_product_screen.dart';
 
 class ProductScreen extends StatelessWidget {
   static const routeName = '/product';
@@ -63,7 +64,9 @@ class ProductScreen extends StatelessWidget {
                   ),
       ),
       floatingActionButton: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).pushNamed(EditProductScreen.routeName);
+          },
           child: Icon(Icons.add, color: Colors.white),
           backgroundColor: Colors.lightGreen[800]),
     );
