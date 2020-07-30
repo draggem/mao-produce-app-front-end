@@ -128,7 +128,7 @@ class DataSearch extends SearchDelegate<String> {
 
     for (var i = 0; i < productData.length; i++) {
       customerList.add(
-        productData[i].title + ' \$ ' + productData[i].price.toString(),
+        productData[i].title + ' \$' + productData[i].price.toString(),
       );
     }
 
@@ -186,7 +186,7 @@ class DataSearch extends SearchDelegate<String> {
     for (var i = 0; i < productData.items.length; i++) {
       customerList.add(
         productData.items[i].title +
-            ' \$ ' +
+            ' \$' +
             productData.items[i].price.toString(),
       );
     }

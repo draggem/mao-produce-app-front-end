@@ -31,7 +31,6 @@ class ProductHttps with ChangeNotifier {
       (product) {
         String prodTitle = product.title;
         if (name.contains(prodTitle)) {
-          print('oten');
           productsList.add(
             ProductsModel(
                 title: prodTitle,

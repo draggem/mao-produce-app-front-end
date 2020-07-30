@@ -58,17 +58,3 @@ class AppDrawer extends StatelessWidget {
     );
   }
 }
-
-//   child: ListView.builder(
-//     itemCount: OPTIONS.length,
-//     itemBuilder: (_, i) => Column(
-//       children: [
-//         DrawerItem(
-//           OPTIONS[i].routeName,
-//           OPTIONS[i].title,
-//           OPTIONS[i].icon,
-//         ),
-//       ],
-//     ),
-//   ),
-// );

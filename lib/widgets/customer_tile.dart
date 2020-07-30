@@ -5,6 +5,7 @@ import 'package:vibration/vibration.dart';
 
 import '../screens/edit_customer_screen.dart';
 import '../screens/customer_screen.dart';
+import '../screens/order_screen.dart';
 
 import '../providers/customer_https.dart';
 
@@ -136,6 +137,17 @@ class _CustomerTileState extends State<CustomerTile> {
         ),
       ),
       secondaryActions: <Widget>[
+        IconSlideAction(
+          foregroundColor: Colors.white,
+          caption: 'Orders',
+          color: Colors.blue,
+          icon: Icons.assignment,
+          onTap: () {
+            Navigator.of(context).pushNamed(
+              OrderScreen.routeName,
+            );
+          },
+        ),
         IconSlideAction(
           foregroundColor: Colors.white,
           caption: 'Edit',
