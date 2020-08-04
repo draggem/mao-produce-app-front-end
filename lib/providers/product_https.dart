@@ -11,7 +11,7 @@ class ProductHttps with ChangeNotifier {
     ProductsModel(
         id: 'gago',
         title: 'VegeTales',
-        price: 12,
+        price: 12.00,
         url: 'https://picsum.photos/id/237/200/300'),
   ];
 

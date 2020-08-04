@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import './orderproduct_model.dart';
+import './order_product_model.dart';
 
 class OrderModel {
   String id;
   double totalPrice;
   bool isOpen;
   DateTime orderDate;
-  List<OrderProduct> products;
+  List<OrderProductModel> products;
 
   OrderModel({
     @required this.id,

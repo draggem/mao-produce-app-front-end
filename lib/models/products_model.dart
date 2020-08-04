@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 
-class ProductsModel {
-  String id;
-  double price;
-  String title;
+import './base_product_model.dart';
+
+class ProductsModel extends BaseProductModel {
   String url;
 
   ProductsModel({
-    @required this.id,
-    @required this.price,
-    @required this.title,
-    this.url,
-  });
+    id,
+    price,
+    title,
+    @required this.url,
+  }) : super(
+          id: id,
+          price: price,
+          title: title,
+        );
 }

@@ -143,9 +143,8 @@ class _CustomerTileState extends State<CustomerTile> {
           color: Colors.blue,
           icon: Icons.assignment,
           onTap: () {
-            Navigator.of(context).pushNamed(
-              OrderScreen.routeName,
-            );
+            Navigator.of(context)
+                .pushNamed(OrderScreen.routeName, arguments: widget.id);
           },
         ),
         IconSlideAction(

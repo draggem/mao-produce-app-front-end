@@ -8,6 +8,7 @@ import './providers/user_service.dart';
 import './providers/customer_https.dart';
 import './providers/recent_searches.dart';
 import './providers/product_https.dart';
+import './providers/order_https.dart';
 
 import './screens/auth_screen.dart';
 import './screens/menu_screen.dart';
@@ -42,6 +43,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider.value(
           value: ProductHttps(),
+        ),
+        ChangeNotifierProvider.value(
+          value: OrderHttps(),
         )
       ],
       child: Consumer<UserService>(

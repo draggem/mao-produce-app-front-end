@@ -4,21 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/order_model.dart';
-import '../models/orderproduct_model.dart';
+import '../models/order_product_model.dart';
 
 class OrderHttps with ChangeNotifier {
   List<OrderModel> _items = [
     OrderModel(
       id: 'p1',
-      totalPrice: 36,
+      totalPrice: 36.00,
       isOpen: true,
       orderDate: DateTime.now(),
       products: [
-        OrderProduct(
+        OrderProductModel(
           id: 'gago',
-          price: 12,
+          price: 12.00,
           title: 'VegeTales',
-          quantity: 3,
+          quantity: 3.00,
         )
       ],
     ),
@@ -54,24 +54,52 @@ class OrderHttps with ChangeNotifier {
     );
     return orderList;
   }
-}
 
 //get order http request/response
-Future<void> fetchAndSetProducts(String id, bool isOpen) async {
-  var url =
-      'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Orders/$id?isOpen=$isOpen';
+  Future<void> fetchAndSetOrder(String custId, bool isOpen) async {
+    var url =
+        'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Orders/$custId?isOpen=$isOpen';
 
-  try {
-    // final response = await http.get(url);
+    try {
+      final response = await http.get(url);
+      print(response.body);
 
-    // final List<OrderModel> loadedOrders = [];
-    // final extractedData = json.decode(response.body);
+      final List<OrderModel> loadedOrders = [];
+      final extractedData = json.decode(response.body);
 
-    // if (extractedData == null) {
-    //   return;
-    // }
+      if (extractedData == null) {
+        return;
+      }
 
-    // print(extractedData);
-    // for (var i = 0; i < extractedData.length; i++) {}
-  } catch (e) {}
+      print(extractedData);
+
+      for (var i = 0; i < extractedData.length; i++) {
+        if (extractedData[i]['id'] != null) {
+          loadedOrders.add(
+            OrderModel(
+              id: extractedData[i]['id'],
+              orderDate: DateTime.parse(extractedData[i]['datetime']),
+              totalPrice: double.parse(extractedData[i]['totalprice']),
+              isOpen: (extractedData[i]['isopen']),
+              products: (extractedData['products'] as List<dynamic>)
+                  .map(
+                    (item) => OrderProductModel(
+                      id: item['id'],
+                      quantity: double.parse(item['quantity'] + '.0'),
+                      price: double.parse(item['price'] + '.0'),
+                      title: item['title'],
+                    ),
+                  )
+                  .toList(),
+            ),
+          );
+        }
+      }
+
+      _items = loadedOrders;
+      notifyListeners();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }
