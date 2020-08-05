@@ -62,7 +62,9 @@ class OrderHttps with ChangeNotifier {
 
     try {
       final response = await http.get(url);
-      print(response.body);
+      if (response.body[0].contains('error')) {
+        return null;
+      }
 
       final List<OrderModel> loadedOrders = [];
       final extractedData = json.decode(response.body);
@@ -81,12 +83,12 @@ class OrderHttps with ChangeNotifier {
               orderDate: DateTime.parse(extractedData[i]['datetime']),
               totalPrice: double.parse(extractedData[i]['totalprice']),
               isOpen: (extractedData[i]['isopen']),
-              products: (extractedData['products'] as List<dynamic>)
+              products: (extractedData[i]['products'] as List<dynamic>)
                   .map(
                     (item) => OrderProductModel(
                       id: item['id'],
-                      quantity: double.parse(item['quantity'] + '.0'),
-                      price: double.parse(item['price'] + '.0'),
+                      quantity: double.parse(item['quantity']),
+                      price: double.parse(item['price']),
                       title: item['title'],
                     ),
                   )
@@ -97,6 +99,7 @@ class OrderHttps with ChangeNotifier {
       }
 
       _items = loadedOrders;
+      print('gay gay gay ${_items.toString()}');
       notifyListeners();
     } catch (e) {
       print(e.toString());

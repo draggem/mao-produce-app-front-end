@@ -62,7 +62,7 @@ class _OrderScreenState extends State<OrderScreen> {
             ),
             itemBuilder: (ctx) => [
               PopupMenuItem(
-                child: Text('Only Favorites'),
+                child: Text('Open Orders'),
                 value: FilterOptions.Open,
               ),
               PopupMenuItem(
@@ -94,14 +94,16 @@ class _OrderScreenState extends State<OrderScreen> {
                             dateTime: orderData.items[i].orderDate,
                             isOpen: orderData.items[i].isOpen,
                             totalprice: orderData.items[i].totalPrice,
-                            products: orderData.items[i].products.map(
-                              (prod) => OrderProductModel(
-                                quantity: prod.quantity,
-                                id: prod.id,
-                                price: prod.price,
-                                title: prod.title,
-                              ),
-                            ),
+                            products: orderData.items[i].products
+                                .map(
+                                  (prod) => OrderProductModel(
+                                    quantity: prod.quantity,
+                                    id: prod.id,
+                                    price: prod.price,
+                                    title: prod.title,
+                                  ),
+                                )
+                                .toList(),
                           ),
                         ),
                       ),

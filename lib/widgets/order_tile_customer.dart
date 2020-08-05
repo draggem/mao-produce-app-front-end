@@ -11,7 +11,7 @@ class OrderTileCustomer extends StatefulWidget {
   final double totalprice;
   final DateTime dateTime;
   final bool isOpen;
-  final List<OrderProductModel> products;
+  final List<dynamic> products;
 
   OrderTileCustomer({
     this.id,
@@ -41,27 +41,19 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
             children: <Widget>[
               ListTile(
                 leading: widget.isOpen == true
-                    ? Icon(Icons.check_circle, color: Colors.pink)
-                    : Icon(Icons.remove_circle, color: Colors.black),
+                    ? Icon(Icons.check_circle, color: Colors.pink, size: 50)
+                    : Icon(Icons.remove_circle, color: Colors.black, size: 50),
                 title: Text(widget.id),
                 subtitle: Text(
                   DateFormat.yMMMMEEEEd().format(widget.dateTime).toString(),
                 ),
-                trailing: Column(
-                  children: <Widget>[
-                    Text(
-                      widget.totalprice.toStringAsFixed(2),
-                    ),
-                    SizedBox(height: 5),
-                    IconButton(
-                        icon: Icon(
-                            _expanded ? Icons.expand_less : Icons.expand_more),
-                        onPressed: () {
-                          setState(() {
-                            _expanded = !_expanded;
-                          });
-                        })
-                  ],
+                trailing: IconButton(
+                  icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
+                  onPressed: () {
+                    setState(() {
+                      _expanded = !_expanded;
+                    });
+                  },
                 ),
               ),
               AnimatedContainer(
@@ -82,8 +74,11 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
+                            SizedBox(
+                              width: 5,
+                            ),
                             Text(
-                              '${prod.quantity}x \$${prod.price.toStringAsFixed(2)}',
+                              '${prod.quantity.toStringAsFixed(0)} x   \$${prod.price.toStringAsFixed(2)}',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
