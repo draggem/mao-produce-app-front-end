@@ -4,16 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
-import '../models/order_product_model.dart';
-
-class OrderTileCustomer extends StatefulWidget {
+class OrderAllTile extends StatefulWidget {
+  final String custId;
+  final String custName;
   final String id;
   final double totalPrice;
   final DateTime dateTime;
   final bool isOpen;
   final List<dynamic> products;
 
-  OrderTileCustomer({
+  OrderAllTile({
+    this.custId,
+    this.custName,
     this.id,
     this.totalPrice,
     this.dateTime,
@@ -22,10 +24,10 @@ class OrderTileCustomer extends StatefulWidget {
   });
 
   @override
-  _OrderTileCustomerState createState() => _OrderTileCustomerState();
+  _OrderAllTileState createState() => _OrderAllTileState();
 }
 
-class _OrderTileCustomerState extends State<OrderTileCustomer> {
+class _OrderAllTileState extends State<OrderAllTile> {
   var _expanded = false;
   @override
   Widget build(BuildContext context) {
@@ -43,16 +45,17 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
                 leading: widget.isOpen == false
                     ? Icon(Icons.check_circle, color: Colors.pink, size: 50)
                     : Icon(Icons.adjust, color: Colors.black, size: 50),
-                title: Text(
-                  widget.id.substring(1, 7),
-                ),
+                title: Text(widget.custName, maxLines: 1),
                 subtitle: Text(
                   DateFormat('dd/MM/yyyy').format(widget.dateTime).toString(),
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text('\$${widget.totalPrice.toStringAsFixed(2)}'),
+                    Text(
+                      '${widget.id.substring(1, 7)}',
+                      overflow: TextOverflow.fade,
+                    ),
                     IconButton(
                       icon: Icon(
                           _expanded ? Icons.expand_less : Icons.expand_more),

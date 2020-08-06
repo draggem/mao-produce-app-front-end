@@ -7,6 +7,7 @@ import '../models/order_product_model.dart';
 
 import '../widgets/app_drawer.dart';
 import '../widgets/order_tile_customer.dart';
+import '../widgets/order_all_tile.dart';
 
 enum FilterOptions { Open, All }
 
@@ -21,23 +22,37 @@ class OrderScreen extends StatefulWidget {
 class _OrderScreenState extends State<OrderScreen> {
   String custId = " ";
 
-  var _showOnlyOpen = false;
+  var appBarTitle = 'Orders';
+
+  var _showOnlyOpen = true;
   var _isInit = true;
 
 //checks if I get customer id opening this screen
   @override
   void didChangeDependencies() {
-    if (_isInit) {
-      custId = ModalRoute.of(context).settings.arguments as String;
+    if (ModalRoute.of(context).settings.arguments != null) {
+      final arg = ModalRoute.of(context).settings.arguments as List;
+      if (arg.length == 2) {
+        setState(() {
+          custId = arg[0];
+          appBarTitle = '${arg[1]} Orders';
+        });
+      }
     }
 
+    _isInit = false;
     super.didChangeDependencies();
   }
 
 //refresh orders function
   Future<void> _refreshOrders(BuildContext context) async {
-    await Provider.of<OrderHttps>(context, listen: false)
-        .fetchAndSetOrder(custId, true);
+    if (ModalRoute.of(context).settings.arguments != null) {
+      await Provider.of<OrderHttps>(context, listen: false)
+          .fetchAndSetOrder(custId, _showOnlyOpen);
+    } else {
+      await Provider.of<OrderHttps>(context, listen: false)
+          .fetchAndSetAllOrder(_showOnlyOpen);
+    }
   }
 
   @override
@@ -45,7 +60,7 @@ class _OrderScreenState extends State<OrderScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Orders'),
+        title: Text(appBarTitle),
         actions: <Widget>[
           PopupMenuButton(
             onSelected: (FilterOptions selectedValue) {
@@ -77,38 +92,78 @@ class _OrderScreenState extends State<OrderScreen> {
       drawer: AppDrawer(),
       body: FutureBuilder(
         future: _refreshOrders(context),
-        builder: (ctx, snapshot) =>
-            snapshot.connectionState == ConnectionState.waiting
-                ? Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : RefreshIndicator(
-                    onRefresh: () => _refreshOrders(context),
-                    child: Consumer<OrderHttps>(
-                      builder: (ctx, orderData, _) => Padding(
-                        padding: EdgeInsets.all(5),
-                        child: ListView.builder(
-                          itemCount: orderData.items.length,
-                          itemBuilder: (_, i) => OrderTileCustomer(
-                            id: orderData.items[i].id,
-                            dateTime: orderData.items[i].orderDate,
-                            isOpen: orderData.items[i].isOpen,
-                            totalprice: orderData.items[i].totalPrice,
-                            products: orderData.items[i].products
-                                .map(
-                                  (prod) => OrderProductModel(
-                                    quantity: prod.quantity,
-                                    id: prod.id,
-                                    price: prod.price,
-                                    title: prod.title,
+        builder: (ctx, snapshot) => snapshot.connectionState ==
+                ConnectionState.waiting
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : RefreshIndicator(
+                onRefresh: () => _refreshOrders(context),
+                child: Consumer<OrderHttps>(
+                  builder: (ctx, orderData, _) => orderData.items.length == 0
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              child: Image(
+                                image: AssetImage('assets/img/NoOrder.gif'),
+                              ),
+                            ),
+                            Container(
+                              child: Text(
+                                'There are no Orders...',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                            )
+                          ],
+                        )
+                      : Padding(
+                          padding: EdgeInsets.all(5),
+                          child: custId == " "
+                              ? ListView.builder(
+                                  itemCount: orderData.items.length,
+                                  itemBuilder: (_, i) => OrderAllTile(
+                                    custId: orderData.items[i].custId,
+                                    custName: orderData.items[i].custName,
+                                    id: orderData.items[i].id,
+                                    dateTime: orderData.items[i].orderDate,
+                                    isOpen: orderData.items[i].isOpen,
+                                    totalPrice: orderData.items[i].totalPrice,
+                                    products: orderData.items[i].products
+                                        .map(
+                                          (prod) => OrderProductModel(
+                                            quantity: prod.quantity,
+                                            id: prod.id,
+                                            price: prod.price,
+                                            title: prod.title,
+                                          ),
+                                        )
+                                        .toList(),
                                   ),
                                 )
-                                .toList(),
-                          ),
+                              : ListView.builder(
+                                  itemCount: orderData.items.length,
+                                  itemBuilder: (_, i) => OrderTileCustomer(
+                                    id: orderData.items[i].id,
+                                    dateTime: orderData.items[i].orderDate,
+                                    isOpen: orderData.items[i].isOpen,
+                                    totalPrice: orderData.items[i].totalPrice,
+                                    products: orderData.items[i].products
+                                        .map(
+                                          (prod) => OrderProductModel(
+                                            quantity: prod.quantity,
+                                            id: prod.id,
+                                            price: prod.price,
+                                            title: prod.title,
+                                          ),
+                                        )
+                                        .toList(),
+                                  ),
+                                ),
                         ),
-                      ),
-                    ),
-                  ),
+                ),
+              ),
       ),
     );
   }

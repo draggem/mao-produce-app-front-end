@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mao_produce/screens/product_screen.dart';
 
 import '../screens/customer_screen.dart';
+import '../screens/order_screen.dart';
 
 import './custom_icons_icons.dart';
 
@@ -16,7 +17,7 @@ const OPTIONS = const [
     color: Color.fromRGBO(3, 153, 18, 1),
   ),
   MenuOptions(
-    routeName: null,
+    routeName: OrderScreen.routeName,
     title: 'Orders',
     icon: Icons.assignment,
     color: Colors.blue,
