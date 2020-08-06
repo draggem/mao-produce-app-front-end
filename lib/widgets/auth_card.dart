@@ -136,14 +136,15 @@ class _AuthCardState extends State<AuthCard>
         await Provider.of<UserService>(context, listen: false)
             .signUp(_authData['email'], _authData['password']);
 
+        setState(() {
+          _isLoading = false;
+        });
+
         success = true;
 
         _showErrorDialog(
             'An email has been sent to verify your account', success);
       }
-      setState(() {
-        _isLoading = false;
-      });
     } on CognitoClientException catch (error) {
       var errorMessage = 'Authentication Failed';
       print(error.toString());
