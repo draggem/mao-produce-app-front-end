@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 import '../models/order_model.dart';
 import '../models/order_product_model.dart';
@@ -34,17 +35,24 @@ class OrderHttps with ChangeNotifier {
     return _items.firstWhere((order) => order.id == id);
   }
 
-//function to find name for search bars
-  List<OrderAllModel> findByName(String name) {
+//function to find query for search bars
+  List<OrderAllModel> findByQuery(String query) {
     final List<OrderAllModel> orderList = [];
     _items.forEach(
       (order) {
         String orderId = order.id;
-        if (name.contains(orderId)) {
+        String orderCustName = order.custName == null ? query : order.custName;
+        String orderDate =
+            DateFormat('dd/MM/yyyy').format(order.orderDate).toString();
+        String totalPrice = order.totalPrice.toString();
+        if (query.contains(orderId) &&
+            query.contains(orderCustName) &&
+            query.contains(orderDate) &&
+            query.contains(totalPrice)) {
           orderList.add(
             OrderAllModel(
               custId: order.custId,
-              custName: order.custName,
+              custName: order.custName == null ? 'gay' : order.custName,
               id: orderId,
               totalPrice: order.totalPrice,
               isOpen: order.isOpen,
@@ -119,7 +127,6 @@ class OrderHttps with ChangeNotifier {
 
     try {
       final response = await http.get(url);
-      print(response.body);
       final List<OrderAllModel> loadedOrders = [];
       final extractedData = json.decode(response.body);
 

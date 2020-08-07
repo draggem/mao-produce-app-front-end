@@ -44,7 +44,7 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
                     ? Icon(Icons.check_circle, color: Colors.pink, size: 50)
                     : Icon(Icons.adjust, color: Colors.black, size: 50),
                 title: Text(
-                  widget.id.substring(1, 7),
+                  widget.id.substring(0, 7),
                 ),
                 subtitle: Text(
                   DateFormat('dd/MM/yyyy').format(widget.dateTime).toString(),

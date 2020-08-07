@@ -61,7 +61,13 @@ class CustomerScreen extends StatelessWidget {
         future: _refreshCustomers(context),
         builder: (ctx, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
-                ? Center(child: CircularProgressIndicator())
+                ? Center(
+                    child: Center(
+                      child: Image(
+                        image: AssetImage('assets/img/LoadingCartoon.gif'),
+                      ),
+                    ),
+                  )
                 : RefreshIndicator(
                     onRefresh: () => _refreshCustomers(context),
                     child: Consumer<CustomerHttps>(

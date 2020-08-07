@@ -53,7 +53,7 @@ class _OrderAllTileState extends State<OrderAllTile> {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Text(
-                      '${widget.id.substring(1, 7)}',
+                      '${widget.id.substring(0, 6)}',
                       overflow: TextOverflow.fade,
                     ),
                     IconButton(

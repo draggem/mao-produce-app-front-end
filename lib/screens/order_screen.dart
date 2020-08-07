@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 import '../providers/order_https.dart';
+import '../providers/recent_searches.dart';
 
 import '../models/order_product_model.dart';
+
+import '../screens/searched_order_screen.dart';
+import '../screens/edit_order_screen.dart';
 
 import '../widgets/app_drawer.dart';
 import '../widgets/order_tile_customer.dart';
@@ -22,6 +27,8 @@ class OrderScreen extends StatefulWidget {
 class _OrderScreenState extends State<OrderScreen> {
   String custId = " ";
 
+  static String custName = " ";
+
   var appBarTitle = 'Orders';
 
   var _showOnlyOpen = true;
@@ -36,6 +43,7 @@ class _OrderScreenState extends State<OrderScreen> {
         setState(() {
           custId = arg[0];
           appBarTitle = '${arg[1]} Orders';
+          custName = '${arg[1]}';
         });
       }
     }
@@ -86,7 +94,12 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
             ],
           ),
-          IconButton(icon: Icon(Icons.search), onPressed: () {})
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              showSearch(context: context, delegate: DataSearch());
+            },
+          )
         ],
       ),
       drawer: AppDrawer(),
@@ -95,7 +108,9 @@ class _OrderScreenState extends State<OrderScreen> {
         builder: (ctx, snapshot) => snapshot.connectionState ==
                 ConnectionState.waiting
             ? Center(
-                child: CircularProgressIndicator(),
+                child: Image(
+                  image: AssetImage('assets/img/LoadingCartoon.gif'),
+                ),
               )
             : RefreshIndicator(
                 onRefresh: () => _refreshOrders(context),
@@ -165,6 +180,174 @@ class _OrderScreenState extends State<OrderScreen> {
                 ),
               ),
       ),
+      floatingActionButton: custId == " "
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pushReplacementNamed(EditOrderScreen.routeName);
+              },
+              child: Icon(Icons.add, color: Colors.white),
+              backgroundColor: Colors.lightGreen[800])
+          : Container(),
     );
+  }
+}
+
+//-------------------------------SearchBar Class-------------------------------------------------------------
+class DataSearch extends SearchDelegate<String> {
+  var recent = [];
+  ThemeData appBarTheme(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return theme.copyWith(
+      primaryColor: Colors.white,
+      textTheme: theme.textTheme.copyWith(
+        headline6: theme.textTheme.headline6.copyWith(color: Colors.black),
+      ),
+    );
+  }
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    //Actions for the appbar
+    return [
+      IconButton(
+        color: Theme.of(context).primaryColor,
+        icon: AnimatedIcon(
+          icon: AnimatedIcons.menu_close,
+          progress: transitionAnimation,
+        ),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    //leading icon(on the left of the app bar)
+    return IconButton(
+      color: Theme.of(context).primaryColor,
+      icon: AnimatedIcon(
+        icon: AnimatedIcons.menu_arrow,
+        progress: transitionAnimation,
+      ),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+  }
+
+//When search is entered on keyboard
+  @override
+  Widget buildResults(BuildContext context) {
+    final recentSearchProvider = Provider.of<RecentSearches>(context);
+    recent = recentSearchProvider.recentCustomers;
+    final orderData = Provider.of<OrderHttps>(context).findByQuery(query);
+    final customerList = [];
+
+    for (var i = 0; i < orderData.length; i++) {
+      customerList.add('${orderData[i].id}' +
+          ' ${orderData[i].custName == null ? ' ' : orderData[i].custName}' +
+          ' ${DateFormat('dd/MM/yyyy').format(orderData[i].orderDate).toString()}' +
+          ' \$${orderData[i].totalPrice.toStringAsFixed(2)}');
+    }
+
+    final suggestionList = query.isEmpty
+        ? recent
+        : customerList
+            .where(
+              (input) => input.contains(
+                RegExp(query, caseSensitive: false),
+              ),
+            )
+            .toList();
+
+    return ListView.builder(
+        itemBuilder: (context, index) => ListTile(
+              //Function when data that is searched is tapped
+              onTap: () {
+                final searchedData = [
+                  suggestionList[index],
+                  _OrderScreenState.custName == " "
+                      ? 'customerOrder'
+                      : 'allOrder'
+                ];
+                Navigator.of(context).pushNamed(SearchedOrderScreen.routeName,
+                    arguments: searchedData);
+                recentSearchProvider.addRecent(suggestionList[index]);
+              },
+              leading: Icon(
+                Icons.perm_identity,
+                color: Theme.of(context).primaryColor,
+              ),
+              title: RichText(
+                text: TextSpan(
+                  text: suggestionList[index].substring(0, query.length),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: suggestionList[index].substring(query.length),
+                      style: TextStyle(color: Colors.grey),
+                    )
+                  ],
+                ),
+              ),
+            ),
+        itemCount: suggestionList.length);
+  }
+
+  //shows the suggestions based from what you typed on the search field
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final recentSearchProvider = Provider.of<RecentSearches>(context);
+    recent = recentSearchProvider.recentCustomers;
+    final orderData = Provider.of<OrderHttps>(context);
+    final orderList = [];
+
+    for (var i = 0; i < orderData.items.length; i++) {
+      orderList.add('${orderData.items[i].id}' +
+          ' ${orderData.items[i].custName == null ? ' ' : orderData.items[i].custName}' +
+          ' ${DateFormat('dd/MM/yyyy').format(orderData.items[i].orderDate).toString()}' +
+          ' \$${orderData.items[i].totalPrice.toStringAsFixed(2)}');
+    }
+
+    final suggestionList = query.isEmpty
+        ? recent
+        : orderList
+            .where(
+              (input) => input.contains(
+                RegExp(query, caseSensitive: false),
+              ),
+            )
+            .toList();
+
+    return ListView.builder(
+        itemBuilder: (context, index) => ListTile(
+            //Function when data that is searched is tapped
+            onTap: () {
+              final searchedData = [
+                suggestionList[index],
+                _OrderScreenState.custName == " "
+                    ? 'customerOrder '
+                    : 'allOrder'
+              ];
+              Navigator.of(context).pushNamed(SearchedOrderScreen.routeName,
+                  arguments: searchedData);
+              recentSearchProvider.addRecent(suggestionList[index]);
+            },
+            leading: Icon(
+              Icons.perm_identity,
+              color: Theme.of(context).primaryColor,
+            ),
+            title: Text(
+              suggestionList[index],
+              style: TextStyle(color: Theme.of(context).primaryColor),
+            )),
+        itemCount: suggestionList.length);
   }
 }

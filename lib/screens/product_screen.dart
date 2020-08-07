@@ -42,7 +42,13 @@ class ProductScreen extends StatelessWidget {
         future: _refreshProducts(context),
         builder: (ctx, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
-                ? Center(child: CircularProgressIndicator())
+                ? Center(
+                    child: Center(
+                      child: Image(
+                        image: AssetImage('assets/img/LoadingCartoon.gif'),
+                      ),
+                    ),
+                  )
                 : RefreshIndicator(
                     onRefresh: () => _refreshProducts(context),
                     child: Consumer<ProductHttps>(
