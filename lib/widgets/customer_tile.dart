@@ -6,6 +6,7 @@ import 'package:vibration/vibration.dart';
 import '../screens/edit_customer_screen.dart';
 import '../screens/customer_screen.dart';
 import '../screens/order_screen.dart';
+import '../screens/edit_order_screen.dart';
 
 import '../providers/customer_https.dart';
 
@@ -123,7 +124,12 @@ class _CustomerTileState extends State<CustomerTile> {
       child: Container(
         color: Colors.white,
         child: ListTile(
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).pushNamed(
+              EditOrderScreen.routeName,
+              arguments: widget.id,
+            );
+          },
           leading: CircleAvatar(
             backgroundColor: Theme.of(context).primaryColor,
             child: Text('${widget.name[0]}'),
@@ -137,32 +143,38 @@ class _CustomerTileState extends State<CustomerTile> {
         ),
       ),
       secondaryActions: <Widget>[
-        IconSlideAction(
-          foregroundColor: Colors.white,
-          caption: 'Orders',
-          color: Colors.blue,
-          icon: Icons.assignment,
-          onTap: () {
-            Navigator.of(context).pushNamed(OrderScreen.routeName,
-                arguments: [widget.id, widget.name]);
-          },
-        ),
-        IconSlideAction(
-          foregroundColor: Colors.white,
-          caption: 'Edit',
-          color: Colors.orange,
-          icon: Icons.edit,
-          onTap: () {
-            Navigator.of(context)
-                .pushNamed(EditCustomerScreen.routeName, arguments: widget.id);
-          },
-        ),
-        IconSlideAction(
-          caption: 'Delete',
-          color: Colors.red,
-          icon: Icons.delete,
-          onTap: _confirmDelete,
-        ),
+        CustomerScreen.isOrderAdding == false
+            ? IconSlideAction(
+                foregroundColor: Colors.white,
+                caption: 'Orders',
+                color: Colors.blue,
+                icon: Icons.assignment,
+                onTap: () {
+                  Navigator.of(context).pushNamed(OrderScreen.routeName,
+                      arguments: [widget.id, widget.name]);
+                },
+              )
+            : Container(),
+        CustomerScreen.isOrderAdding == false
+            ? IconSlideAction(
+                foregroundColor: Colors.white,
+                caption: 'Edit',
+                color: Colors.orange,
+                icon: Icons.edit,
+                onTap: () {
+                  Navigator.of(context).pushNamed(EditCustomerScreen.routeName,
+                      arguments: widget.id);
+                },
+              )
+            : Container(),
+        CustomerScreen.isOrderAdding == false
+            ? IconSlideAction(
+                caption: 'Delete',
+                color: Colors.red,
+                icon: Icons.delete,
+                onTap: _confirmDelete,
+              )
+            : Container(),
       ],
     );
   }

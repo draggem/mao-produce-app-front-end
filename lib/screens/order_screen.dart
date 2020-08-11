@@ -8,7 +8,7 @@ import '../providers/recent_searches.dart';
 import '../models/order_product_model.dart';
 
 import '../screens/searched_order_screen.dart';
-import '../screens/edit_order_screen.dart';
+import '../screens/customer_screen.dart';
 
 import '../widgets/app_drawer.dart';
 import '../widgets/order_tile_customer.dart';
@@ -184,7 +184,7 @@ class _OrderScreenState extends State<OrderScreen> {
           ? FloatingActionButton(
               onPressed: () {
                 Navigator.of(context)
-                    .pushReplacementNamed(EditOrderScreen.routeName);
+                    .pushNamed(CustomerScreen.routeName, arguments: true);
               },
               child: Icon(Icons.add, color: Colors.white),
               backgroundColor: Colors.lightGreen[800])

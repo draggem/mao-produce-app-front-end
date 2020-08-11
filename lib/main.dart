@@ -9,6 +9,7 @@ import './providers/customer_https.dart';
 import './providers/recent_searches.dart';
 import './providers/product_https.dart';
 import './providers/order_https.dart';
+import './providers/adding_product_order.dart';
 
 import './screens/auth_screen.dart';
 import './screens/menu_screen.dart';
@@ -48,7 +49,10 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider.value(
           value: OrderHttps(),
-        )
+        ),
+        ChangeNotifierProvider.value(
+          value: AddingProductOrder(),
+        ),
       ],
       child: Consumer<UserService>(
         builder: (ctx, auth, _) => MaterialApp(

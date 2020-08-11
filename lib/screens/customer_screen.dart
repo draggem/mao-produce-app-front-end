@@ -10,10 +10,19 @@ import '../widgets/customer_tile.dart';
 
 import 'searched_item_screen.dart';
 
-class CustomerScreen extends StatelessWidget {
+class CustomerScreen extends StatefulWidget {
   //route name
   static const routeName = '/customer';
 
+  //checks if you are selecting customer or not
+  static bool isOrderAdding = false;
+
+  @override
+  _CustomerScreenState createState() => _CustomerScreenState();
+}
+
+class _CustomerScreenState extends State<CustomerScreen> {
+  String title = 'Customers';
   Future<void> _refreshCustomers(BuildContext context) async {
     try {
       await Provider.of<CustomerHttps>(context, listen: false)
@@ -42,11 +51,24 @@ class CustomerScreen extends StatelessWidget {
   }
 
   @override
+  void didChangeDependencies() {
+    if (ModalRoute.of(context).settings.arguments != null) {
+      CustomerScreen.isOrderAdding =
+          ModalRoute.of(context).settings.arguments as bool;
+      title = 'Select A Customer';
+    } else {
+      CustomerScreen.isOrderAdding = false;
+      title = 'Customers';
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Customers'),
+        title: Text(title),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search),
@@ -84,13 +106,15 @@ class CustomerScreen extends StatelessWidget {
                     ),
                   ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed(EditCustomerScreen.routeName);
-        },
-        child: Icon(Icons.add, color: Colors.white),
-        backgroundColor: Colors.lightGreen[800],
-      ),
+      floatingActionButton: CustomerScreen.isOrderAdding == true
+          ? Container()
+          : FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(EditCustomerScreen.routeName);
+              },
+              child: Icon(Icons.add, color: Colors.white),
+              backgroundColor: Colors.lightGreen[800],
+            ),
     );
   }
 }
