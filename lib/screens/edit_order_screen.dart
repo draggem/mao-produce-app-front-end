@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 
 import '../widgets/order_product_list.dart';
 
+import '../screens/product_screen.dart';
+
 import '../providers/customer_https.dart';
 
 class EditOrderScreen extends StatefulWidget {
@@ -52,6 +54,8 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         _initValues = {
           'custId': _editedCustomer.id,
           'custName': _editedCustomer.name,
+          'orderDate':
+              DateFormat.yMMMMEEEEd().format(DateTime.now()).toString(),
         };
       }
     }
@@ -83,23 +87,6 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                 key: _form,
                 child: ListView(
                   children: <Widget>[
-                    SizedBox(height: 7),
-                    TextFormField(
-                      style: TextStyle(color: Colors.white),
-                      enabled: false,
-                      initialValue: _initValues['custId'],
-                      decoration: InputDecoration(
-                        disabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.orangeAccent,
-                          ),
-                        ),
-                        labelText: 'Customer ID',
-                        labelStyle: TextStyle(color: Colors.white),
-                        icon: Icon(Icons.person, color: Colors.orangeAccent),
-                      ),
-                      cursorColor: Colors.white,
-                    ),
                     SizedBox(height: 20),
                     TextFormField(
                       style: TextStyle(color: Colors.white),
@@ -174,7 +161,11 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                     OrderProductList(),
                     SizedBox(height: 4),
                     FlatButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(
+                              ProductScreen.routeName,
+                              arguments: true);
+                        },
                         icon: Icon(Icons.add, color: Colors.white),
                         label: Text(
                           'Add a Product',

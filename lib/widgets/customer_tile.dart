@@ -125,10 +125,14 @@ class _CustomerTileState extends State<CustomerTile> {
         color: Colors.white,
         child: ListTile(
           onTap: () {
-            Navigator.of(context).pushNamed(
-              EditOrderScreen.routeName,
-              arguments: widget.id,
-            );
+            if (CustomerScreen.isOrderAdding == true) {
+              Navigator.of(context).pushNamed(
+                EditOrderScreen.routeName,
+                arguments: widget.id,
+              );
+            } else {
+              return null;
+            }
           },
           leading: CircleAvatar(
             backgroundColor: Theme.of(context).primaryColor,

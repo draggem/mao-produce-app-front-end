@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../widgets/app_drawer.dart';
 import '../widgets/product_tile.dart';
+import '../widgets/pick_product_tile.dart';
 
 import '../providers/product_https.dart';
 import '../providers/recent_searches.dart';
@@ -10,8 +11,18 @@ import '../providers/recent_searches.dart';
 import '../screens/searched_item_screen.dart';
 import '../screens/edit_product_screen.dart';
 
-class ProductScreen extends StatelessWidget {
+class ProductScreen extends StatefulWidget {
   static const routeName = '/product';
+
+  //checks if you are selecting product or not
+  static bool isProductAdding = false;
+
+  @override
+  _ProductScreenState createState() => _ProductScreenState();
+}
+
+class _ProductScreenState extends State<ProductScreen> {
+  String title = 'Products';
 
   Future<void> _refreshProducts(BuildContext context) async {
     try {
@@ -23,12 +34,33 @@ class ProductScreen extends StatelessWidget {
   }
 
   @override
+  void didChangeDependencies() {
+    if (ModalRoute.of(context).settings.arguments != null) {
+      ProductScreen.isProductAdding =
+          ModalRoute.of(context).settings.arguments as bool;
+      title = 'Add A Product';
+    } else {
+      ProductScreen.isProductAdding = false;
+      title = 'Products';
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Products'),
+        title: Text(title),
         actions: <Widget>[
+          ProductScreen.isProductAdding == true
+              ? IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              : Container(),
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () {
@@ -52,29 +84,45 @@ class ProductScreen extends StatelessWidget {
                 : RefreshIndicator(
                     onRefresh: () => _refreshProducts(context),
                     child: Consumer<ProductHttps>(
-                      builder: (ctx, productData, _) => Padding(
-                        padding: EdgeInsets.all(5),
-                        child: Container(
-                          child: ListView.builder(
-                            itemCount: productData.items.length,
-                            itemBuilder: (_, i) => ProductTile(
-                              id: productData.items[i].id,
-                              title: productData.items[i].title,
-                              price: productData.items[i].price,
-                              imgUrl: productData.items[i].url,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                        builder: (ctx, productData, _) =>
+                            ProductScreen.isProductAdding == false
+                                ? Padding(
+                                    padding: EdgeInsets.all(5),
+                                    child: Container(
+                                      child: ListView.builder(
+                                        itemCount: productData.items.length,
+                                        itemBuilder: (_, i) => ProductTile(
+                                          id: productData.items[i].id,
+                                          title: productData.items[i].title,
+                                          price: productData.items[i].price,
+                                          imgUrl: productData.items[i].url,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : Padding(
+                                    padding: EdgeInsets.all(5),
+                                    child: Container(
+                                      child: ListView.builder(
+                                        itemCount: productData.items.length,
+                                        itemBuilder: (_, i) => PickProductTile(
+                                          id: productData.items[i].id,
+                                          title: productData.items[i].title,
+                                          price: productData.items[i].price,
+                                        ),
+                                      ),
+                                    ),
+                                  )),
                   ),
       ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).pushNamed(EditProductScreen.routeName);
-          },
-          child: Icon(Icons.add, color: Colors.white),
-          backgroundColor: Colors.lightGreen[800]),
+      floatingActionButton: ProductScreen.isProductAdding == false
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(EditProductScreen.routeName);
+              },
+              child: Icon(Icons.add, color: Colors.white),
+              backgroundColor: Colors.lightGreen[800])
+          : Container(),
     );
   }
 }

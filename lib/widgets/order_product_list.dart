@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/adding_product_order.dart';
 
-class OrderProductList extends StatelessWidget {
+class OrderProductList extends StatefulWidget {
+  @override
+  _OrderProductListState createState() => _OrderProductListState();
+}
+
+class _OrderProductListState extends State<OrderProductList> {
   @override
   Widget build(BuildContext context) {
     final productList = Provider.of<AddingProductOrder>(context);
@@ -45,7 +51,7 @@ class OrderProductList extends StatelessWidget {
   }
 }
 
-class ProductTile extends StatelessWidget {
+class ProductTile extends StatefulWidget {
   final String id;
   final double price;
   final String title;
@@ -59,7 +65,18 @@ class ProductTile extends StatelessWidget {
   });
 
   @override
+  _ProductTileState createState() => _ProductTileState();
+}
+
+class _ProductTileState extends State<ProductTile> {
+  @override
   Widget build(BuildContext context) {
+    var addProdProvider = Provider.of<AddingProductOrder>(context);
+
+    var textController =
+        new TextEditingController(text: widget.quantity.toStringAsFixed(0));
+    var editedQty = widget.quantity;
+
     return Dismissible(
       background: Container(
         decoration: BoxDecoration(
@@ -71,13 +88,36 @@ class ProductTile extends StatelessWidget {
           ),
         ),
       ),
-      key: Key(id),
+      key: Key(widget.id),
       onDismissed: (direction) {},
       child: ListTile(
-        leading: Text('${quantity.toStringAsFixed(0)}x'),
-        title: Text(title),
+        title: Text(widget.title),
+        leading: IconButton(
+          icon: Icon(Icons.add_circle, color: Theme.of(context).primaryColor),
+          onPressed: () {
+            addProdProvider.editQuantity(widget.id, 1.0);
+            setState(() {
+              editedQty++;
+              textController.text = editedQty.toStringAsFixed(0);
+            });
+            print(textController.text);
+          },
+        ),
+        subtitle: TextFormField(
+          controller: textController,
+          enabled: false,
+          keyboardType: TextInputType.number,
+          inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+          decoration: InputDecoration(
+            labelStyle: TextStyle(color: Colors.black),
+            labelText: 'Qty:',
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+          ),
+        ),
         trailing: Text(
-          price.toStringAsFixed(2),
+          widget.price.toStringAsFixed(2),
         ),
       ),
     );
