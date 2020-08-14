@@ -10,27 +10,9 @@ class AddingProductOrder with ChangeNotifier {
   }
 
 //function to add product
-  void addOrder(OrderProductModel order, String id, double quantity) {
+  void addOrder(OrderProductModel order) {
     //checks if products is in the list or not
-    bool isExist = false;
-
-    if (_items.length != 0) {
-      _items.forEach((element) {
-        if (element.id == id) {
-          element.quantity += quantity;
-          isExist = true;
-        } else {
-          isExist = false;
-        }
-      });
-    } else {
-      _items.add(order);
-      return;
-    }
-
-    if (isExist == false) {
-      _items.add(order);
-    }
+    _items.add(order);
     print(_items);
     notifyListeners();
   }

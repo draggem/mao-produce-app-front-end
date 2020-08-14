@@ -7,6 +7,7 @@ import '../widgets/pick_product_tile.dart';
 
 import '../providers/product_https.dart';
 import '../providers/recent_searches.dart';
+import '../providers/adding_product_order.dart';
 
 import '../screens/searched_item_screen.dart';
 import '../screens/edit_product_screen.dart';
@@ -72,48 +73,52 @@ class _ProductScreenState extends State<ProductScreen> {
       drawer: AppDrawer(),
       body: FutureBuilder(
         future: _refreshProducts(context),
-        builder: (ctx, snapshot) =>
-            snapshot.connectionState == ConnectionState.waiting
-                ? Center(
-                    child: Center(
-                      child: Image(
-                        image: AssetImage('assets/img/LoadingCartoon.gif'),
-                      ),
-                    ),
-                  )
-                : RefreshIndicator(
-                    onRefresh: () => _refreshProducts(context),
-                    child: Consumer<ProductHttps>(
-                        builder: (ctx, productData, _) =>
-                            ProductScreen.isProductAdding == false
-                                ? Padding(
-                                    padding: EdgeInsets.all(5),
-                                    child: Container(
-                                      child: ListView.builder(
-                                        itemCount: productData.items.length,
-                                        itemBuilder: (_, i) => ProductTile(
-                                          id: productData.items[i].id,
-                                          title: productData.items[i].title,
-                                          price: productData.items[i].price,
-                                          imgUrl: productData.items[i].url,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Padding(
-                                    padding: EdgeInsets.all(5),
-                                    child: Container(
-                                      child: ListView.builder(
-                                        itemCount: productData.items.length,
-                                        itemBuilder: (_, i) => PickProductTile(
-                                          id: productData.items[i].id,
-                                          title: productData.items[i].title,
-                                          price: productData.items[i].price,
-                                        ),
-                                      ),
-                                    ),
-                                  )),
+        builder: (ctx, snapshot) => snapshot.connectionState ==
+                ConnectionState.waiting
+            ? Center(
+                child: Center(
+                  child: Image(
+                    image: AssetImage('assets/img/LoadingCartoon.gif'),
                   ),
+                ),
+              )
+            : RefreshIndicator(
+                onRefresh: () => _refreshProducts(context),
+                child: Consumer<ProductHttps>(
+                    builder: (ctx, productData, _) =>
+                        ProductScreen.isProductAdding == false
+                            ? Padding(
+                                padding: EdgeInsets.all(5),
+                                child: Container(
+                                  child: ListView.builder(
+                                    itemCount: productData.items.length,
+                                    itemBuilder: (_, i) => ProductTile(
+                                      id: productData.items[i].id,
+                                      title: productData.items[i].title,
+                                      price: productData.items[i].price,
+                                      imgUrl: productData.items[i].url,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Padding(
+                                padding: EdgeInsets.all(5),
+                                child: Container(
+                                  child: ListView.builder(
+                                      itemCount: productData.items.length,
+                                      itemBuilder: (_, i) {
+                                        return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: PickProductTile(
+                                            id: productData.items[i].id,
+                                            title: productData.items[i].title,
+                                            price: productData.items[i].price,
+                                          ),
+                                        );
+                                      }),
+                                ),
+                              )),
+              ),
       ),
       floatingActionButton: ProductScreen.isProductAdding == false
           ? FloatingActionButton(

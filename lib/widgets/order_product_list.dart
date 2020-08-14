@@ -92,30 +92,7 @@ class _ProductTileState extends State<ProductTile> {
       onDismissed: (direction) {},
       child: ListTile(
         title: Text(widget.title),
-        leading: IconButton(
-          icon: Icon(Icons.add_circle, color: Theme.of(context).primaryColor),
-          onPressed: () {
-            addProdProvider.editQuantity(widget.id, 1.0);
-            setState(() {
-              editedQty++;
-              textController.text = editedQty.toStringAsFixed(0);
-            });
-            print(textController.text);
-          },
-        ),
-        subtitle: TextFormField(
-          controller: textController,
-          enabled: false,
-          keyboardType: TextInputType.number,
-          inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
-          decoration: InputDecoration(
-            labelStyle: TextStyle(color: Colors.black),
-            labelText: 'Qty:',
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
-            ),
-          ),
-        ),
+        leading: Text('Qty:${widget.quantity.toStringAsFixed(0)}'),
         trailing: Text(
           widget.price.toStringAsFixed(2),
         ),
