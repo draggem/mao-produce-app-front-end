@@ -4,10 +4,9 @@ import 'package:provider/provider.dart';
 import '../providers/customer_https.dart';
 import '../providers/product_https.dart';
 
-import '../models/products_model.dart';
-
 import '../widgets/customer_tile.dart';
 import '../widgets/product_tile.dart';
+import '../widgets/pick_product_tile.dart';
 
 class SearchedItemScreen extends StatefulWidget {
   //route name
@@ -66,6 +65,22 @@ class _SearchedItemScreenState extends State<SearchedItemScreen> {
                       title: searchedData[i].title,
                       price: searchedData[i].price,
                       imgUrl: searchedData[i].url),
+                ),
+              );
+            }
+            break;
+          case 'productPicking':
+            {
+              searchedData = productProvider.findByName(query[0]);
+              return Padding(
+                padding: EdgeInsets.all(5),
+                child: ListView.builder(
+                  itemCount: searchedData.length,
+                  itemBuilder: (_, i) => PickProductTile(
+                    id: searchedData[i].id,
+                    title: searchedData[i].title,
+                    price: searchedData[i].price,
+                  ),
                 ),
               );
             }

@@ -3,23 +3,42 @@ import 'package:flutter/material.dart';
 import '../models/order_product_model.dart';
 
 class AddingProductOrder with ChangeNotifier {
-  List<OrderProductModel> _items = [];
+  Map<String, OrderProductModel> _items = {};
 
-  List<OrderProductModel> get items {
-    return [..._items];
+  Map<String, OrderProductModel> get items {
+    return {..._items};
   }
 
 //function to add product
   void addOrder(OrderProductModel order) {
     //checks if products is in the list or not
-    _items.add(order);
+    if (_items.containsKey(order.id)) {
+      _items.update(
+          order.id,
+          (existingProduct) => OrderProductModel(
+                id: existingProduct.id,
+                price: existingProduct.price += order.price,
+                title: existingProduct.title,
+                quantity: existingProduct.quantity += order.quantity,
+              ));
+    } else {
+      _items.putIfAbsent(
+        order.id,
+        () => OrderProductModel(
+          id: order.id,
+          quantity: order.quantity,
+          price: order.price,
+          title: order.title,
+        ),
+      );
+    }
     print(_items);
     notifyListeners();
   }
 
 //function to remove product
   void removeProduct(String id) {
-    _items.removeWhere((product) => product.id == id);
+    _items.remove(id);
 
     notifyListeners();
     print(items);
@@ -28,21 +47,11 @@ class AddingProductOrder with ChangeNotifier {
 //calculates the total price
   double totalPrice() {
     double price = 0;
-    if (items.isNotEmpty) {
-      items.forEach((item) => price += item.quantity * item.price);
-      return price;
-    } else {
-      return price;
-    }
-  }
 
-  //edit quantity
-  void editQuantity(String id, double quantity) {
-    _items.forEach((element) {
-      if (element.id == id) {
-        element.quantity += quantity;
-      }
-    });
-    notifyListeners();
+    _items.forEach(
+      (key, element) => {price += element.quantity * element.price},
+    );
+
+    return price;
   }
 }

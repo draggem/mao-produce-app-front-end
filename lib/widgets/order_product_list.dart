@@ -38,10 +38,10 @@ class _OrderProductListState extends State<OrderProductList> {
             child: ListView.builder(
               itemCount: productList.items.length,
               itemBuilder: (_, i) => ProductTile(
-                id: productList.items[i].id,
-                price: productList.items[i].price,
-                quantity: productList.items[i].quantity,
-                title: productList.items[i].title,
+                id: productList.items.values.toList()[i].id,
+                price: productList.items.values.toList()[i].price,
+                quantity: productList.items.values.toList()[i].quantity,
+                title: productList.items.values.toList()[i].title,
               ),
             ),
           ),
@@ -73,10 +73,6 @@ class _ProductTileState extends State<ProductTile> {
   Widget build(BuildContext context) {
     var addProdProvider = Provider.of<AddingProductOrder>(context);
 
-    var textController =
-        new TextEditingController(text: widget.quantity.toStringAsFixed(0));
-    var editedQty = widget.quantity;
-
     return Dismissible(
       background: Container(
         decoration: BoxDecoration(
@@ -89,7 +85,11 @@ class _ProductTileState extends State<ProductTile> {
         ),
       ),
       key: Key(widget.id),
-      onDismissed: (direction) {},
+      onDismissed: (direction) {
+        setState(() {
+          addProdProvider.removeProduct(widget.id);
+        });
+      },
       child: ListTile(
         title: Text(widget.title),
         leading: Text('Qty:${widget.quantity.toStringAsFixed(0)}'),

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-import '../models/order_model.dart';
 import '../models/order_product_model.dart';
 import '../models/order_all_model.dart';
 
@@ -172,6 +171,58 @@ class OrderHttps with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print(e.toString());
+    }
+  }
+
+  Future<void> addOrder(OrderAllModel order) async {
+    var url =
+        'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Orders/${order.custId}';
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(
+          {
+            'customerid': order.custId,
+            'customername': order.custName,
+            'id': order.id.toString(),
+            'orderData': DateTime.now().toString(),
+            'totalprice': order.totalPrice.toString(),
+            'isopen': order.isOpen.toString(),
+            'products': order.products
+                .map(
+                  (product) => {
+                    'Id': product.id,
+                    'Price': product.price,
+                    'Quantity': product.quantity,
+                    'Title': product.title,
+                  },
+                )
+                .toList(),
+          },
+        ),
+      );
+
+      final extractedResponse = json.decode(response.body);
+
+      print(extractedResponse);
+      final orderId = extractedResponse['orderId'];
+      print(orderId);
+
+      final newOrder = OrderAllModel(
+        id: orderId,
+        custId: order.custId,
+        custName: order.custName,
+        isOpen: order.isOpen,
+        orderDate: DateTime.now(),
+        products: order.products,
+        totalPrice: order.totalPrice,
+      );
+      _items.add(newOrder);
+      notifyListeners();
+    } catch (error) {
+      throw error;
     }
   }
 }

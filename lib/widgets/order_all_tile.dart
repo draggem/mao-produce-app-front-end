@@ -52,9 +52,9 @@ class _OrderAllTileState extends State<OrderAllTile> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(
-                      '${widget.id.substring(0, 6)}',
+                    RichText(
                       overflow: TextOverflow.fade,
+                      text: TextSpan(text: widget.id),
                     ),
                     IconButton(
                       icon: Icon(
@@ -87,13 +87,13 @@ class _OrderAllTileState extends State<OrderAllTile> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text(
-                              '${prod.quantity.toStringAsFixed(0)}x   \$${prod.price.toStringAsFixed(2)}',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                            RichText(
+                              overflow: TextOverflow.fade,
+                              text: TextSpan(
+                                text:
+                                    '${prod.quantity.toStringAsFixed(0)}x   \$${prod.price.toStringAsFixed(2)}',
                               ),
-                            ),
+                            )
                           ],
                         ),
                       )

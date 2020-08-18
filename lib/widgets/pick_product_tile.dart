@@ -51,6 +51,18 @@ class _PickProductTileState extends State<PickProductTile> {
         onChanged: (bool value) {
           setState(() {
             _checked = value;
+            if (_checked) {
+              addOrderProvider.addOrder(
+                OrderProductModel(
+                  id: widget.id,
+                  quantity: editedQty,
+                  price: editedPrice,
+                  title: widget.title,
+                ),
+              );
+            } else {
+              addOrderProvider.removeProduct(widget.id);
+            }
           });
         },
         title: Padding(

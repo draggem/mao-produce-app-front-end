@@ -205,7 +205,10 @@ class DataSearch extends SearchDelegate<String> {
         itemBuilder: (context, index) => ListTile(
               //Function when data that is searched is tapped
               onTap: () {
-                final searchedData = [suggestionList[index], 'product'];
+                final searchedData = [
+                  suggestionList[index],
+                  ProductScreen.isProductAdding ? 'productPicking' : 'product'
+                ];
                 Navigator.of(context).pushNamed(SearchedItemScreen.routeName,
                     arguments: searchedData);
                 recentSearchProvider.addRecent(suggestionList[index]);
@@ -264,7 +267,10 @@ class DataSearch extends SearchDelegate<String> {
         itemBuilder: (context, index) => ListTile(
             //Function when data that is searched is tapped
             onTap: () {
-              final searchedData = [suggestionList[index], 'product'];
+              final searchedData = [
+                suggestionList[index],
+                ProductScreen.isProductAdding ? 'productPicking' : 'product',
+              ];
               Navigator.of(context).pushNamed(SearchedItemScreen.routeName,
                   arguments: searchedData);
               recentSearchProvider.addRecent(suggestionList[index]);
