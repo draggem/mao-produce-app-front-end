@@ -9,6 +9,7 @@ import '../screens/order_screen.dart';
 import '../screens/edit_order_screen.dart';
 
 import '../providers/customer_https.dart';
+import '../providers/adding_product_order.dart';
 
 class CustomerTile extends StatefulWidget {
   final String id;
@@ -126,6 +127,9 @@ class _CustomerTileState extends State<CustomerTile> {
         child: ListTile(
           onTap: () {
             if (CustomerScreen.isOrderAdding == true) {
+              var provider =
+                  Provider.of<AddingProductOrder>(context, listen: false);
+              provider.clear();
               Navigator.of(context).pushNamed(
                 EditOrderScreen.routeName,
                 arguments: widget.id,
@@ -167,7 +171,7 @@ class _CustomerTileState extends State<CustomerTile> {
                 icon: Icons.edit,
                 onTap: () {
                   Navigator.of(context).pushNamed(EditCustomerScreen.routeName,
-                      arguments: widget.id);
+                      arguments: [widget.id, 'selection']);
                 },
               )
             : Container(),

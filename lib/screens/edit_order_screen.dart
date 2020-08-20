@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import '../widgets/order_product_list.dart';
 
 import '../screens/product_screen.dart';
+import '../screens/order_screen.dart';
+import '../screens/signature_screen.dart';
 
 import '../providers/customer_https.dart';
 import '../providers/adding_product_order.dart';
@@ -46,23 +48,26 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
     'totalPrice': '',
   };
 
+  //person who's signed
+  var signee;
+
   var _isInit = true;
   var _isLoading = false;
 
   @override
   void didChangeDependencies() {
     if (_isInit) {
-      final customerId = ModalRoute.of(context).settings.arguments as String;
-      if (customerId != null) {
+      final order = ModalRoute.of(context).settings.arguments as List;
+      if (order[1] == 'selection') {
         var _editedCustomer = Provider.of<CustomerHttps>(context, listen: false)
-            .findById(customerId);
+            .findById(order[0]);
         _initValues = {
           'custId': _editedCustomer.id,
           'custName': _editedCustomer.name,
           'orderDate':
               DateFormat.yMMMMEEEEd().format(DateTime.now()).toString(),
         };
-      }
+      } else {}
     }
     super.didChangeDependencies();
   }
@@ -73,7 +78,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
 
     List<OrderProductModel> productList = [];
 
-    print(_editedOrder.id);
+    var signature;
 
     //for each function to add products inside the productList to put inside
     //the _editedOrder product
@@ -88,16 +93,17 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
       ),
     );
 
+    //get and check saved signature
+    signature = productListProv.sign;
+
     var totalprice = productListProv.totalPrice();
     final isValid = _form.currentState.validate();
 
-    //Check if form is valid
-    if (!isValid) {
-      return;
-    }
     if (productList.isEmpty) {
       _showErrorDialog('Please select Products for the Order');
       return;
+    } else if (!isValid) {
+      _showErrorDialog('Form is incomplete');
     }
 
     setState(() {
@@ -114,7 +120,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
 
     try {
       await Provider.of<OrderHttps>(context, listen: false)
-          .addOrder(_editedOrder);
+          .addOrder(_editedOrder, signature, signee);
     } catch (error) {
       setState(() {
         _isLoading = false;
@@ -125,6 +131,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
     setState(() {
       _isLoading = false;
     });
+    Navigator.of(context).pushReplacementNamed(OrderScreen.routeName);
   }
 
   void _showErrorDialog(String message) {
@@ -147,6 +154,14 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isSign = false;
+    var provider = Provider.of<AddingProductOrder>(context);
+
+    if (provider.sign != null) {
+      setState(() {
+        isSign = true;
+      });
+    }
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
@@ -214,7 +229,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                         initialValue: _initValues['orderDate'],
                         validator: (value) {
                           if (value == '') {
-                            return 'Please select a Customer';
+                            return 'There has to be a Date!';
                           }
                           return null;
                         },
@@ -291,8 +306,41 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    OrderProductList(),
-                    SizedBox(height: 4),
+
+                    TextFormField(
+                        style: TextStyle(color: Colors.white),
+                        cursorColor: Colors.white,
+                        decoration: InputDecoration(
+                          disabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.orangeAccent,
+                            ),
+                          ),
+                          labelText: 'Signee:',
+                          labelStyle: TextStyle(color: Colors.white),
+                          icon: Icon(Icons.person_outline,
+                              color: Colors.orangeAccent),
+                        ),
+                        onSaved: (value) {
+                          signee = value;
+                        }),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    FlatButton.icon(
+                        onPressed: () {
+                          Navigator.of(context)
+                              .pushNamed(SignatureScreen.routeName);
+                        },
+                        icon: Icon(Icons.person, color: Colors.white),
+                        label: Text(
+                          isSign
+                              ? 'This order has been Signed'
+                              : 'This order has no Signature',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        color: isSign ? Colors.orange : Colors.red),
+                    SizedBox(height: 10),
                     FlatButton.icon(
                         onPressed: () {
                           Navigator.of(context).pushNamed(
@@ -305,6 +353,8 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                           style: TextStyle(color: Colors.white),
                         ),
                         color: Colors.orange),
+                    SizedBox(height: 8),
+                    OrderProductList(),
                   ],
                 ),
               ),

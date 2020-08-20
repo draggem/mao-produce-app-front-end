@@ -22,6 +22,7 @@ import './screens/edit_product_screen.dart';
 import './screens/order_screen.dart';
 import './screens/searched_order_screen.dart';
 import './screens/edit_order_screen.dart';
+import './screens/signature_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -95,6 +96,7 @@ class MyApp extends StatelessWidget {
             OrderScreen.routeName: (ctx) => OrderScreen(),
             SearchedOrderScreen.routeName: (ctx) => SearchedOrderScreen(),
             EditOrderScreen.routeName: (ctx) => EditOrderScreen(),
+            SignatureScreen.routeName: (ctx) => SignatureScreen(),
           },
         ),
       ),

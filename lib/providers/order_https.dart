@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 import '../models/order_product_model.dart';
 import '../models/order_all_model.dart';
 
+import '../models/http_exception.dart';
+
 class OrderHttps with ChangeNotifier {
   List<OrderAllModel> _items = [
     // OrderModel(
@@ -107,8 +109,15 @@ class OrderHttps with ChangeNotifier {
                     ),
                   )
                   .toList(),
+              signature: extractedData[i]['signature'].map(
+                (item) => {
+                  'signature': item['signature'].toString(),
+                  'signee': item['signee'].toString(),
+                },
+              ),
             ),
           );
+          print(loadedOrders[i].signature);
         }
       }
 
@@ -162,8 +171,14 @@ class OrderHttps with ChangeNotifier {
                     ),
                   )
                   .toList(),
+              // signature: (extractedData[i]['signature'] as Map<dynamic, String>)
+              //     .map((item) => {
+              //           'signature': item['signature'],
+              //           'signee': item['signee'],
+              //         }),
             ),
           );
+          print(loadedOrders[i].signature);
         }
       }
 
@@ -174,7 +189,10 @@ class OrderHttps with ChangeNotifier {
     }
   }
 
-  Future<void> addOrder(OrderAllModel order) async {
+  //add order function
+
+  Future<void> addOrder(
+      OrderAllModel order, var signature, String signee) async {
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Orders/${order.custId}';
 
@@ -200,6 +218,12 @@ class OrderHttps with ChangeNotifier {
                   },
                 )
                 .toList(),
+            'signature': {
+              'signee': signee == null || signature == null ? '' : signee,
+              'signature': signature == null || signee == null
+                  ? ''
+                  : signature.toString(),
+            }
           },
         ),
       );
@@ -223,6 +247,24 @@ class OrderHttps with ChangeNotifier {
       notifyListeners();
     } catch (error) {
       throw error;
+    }
+  }
+
+  //remove order
+  Future<void> deleteOrder(String id, String custId) async {
+    final url =
+        'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Orders/$custId?orderId=$id';
+    final existingOrderIndex = _items.indexWhere((product) => product.id == id);
+    var existingOrder = _items[existingOrderIndex];
+    notifyListeners();
+
+    final response = await http.delete(url);
+    final msg = response.body;
+    print(msg.toString());
+    if (response.statusCode >= 400) {
+      _items.insert(existingOrderIndex, existingOrder);
+      notifyListeners();
+      throw HttpException('Order could not be deleted');
     }
   }
 }

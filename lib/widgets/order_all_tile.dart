@@ -3,6 +3,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:vibration/vibration.dart';
+
+import '../providers/order_https.dart';
+
+import '../screens/order_screen.dart';
+import '../screens/edit_order_screen.dart';
 
 class OrderAllTile extends StatefulWidget {
   final String custId;
@@ -29,8 +36,100 @@ class OrderAllTile extends StatefulWidget {
 
 class _OrderAllTileState extends State<OrderAllTile> {
   var _expanded = false;
+
   @override
   Widget build(BuildContext context) {
+    final scaffold = Scaffold.of(context);
+
+    void _confirmDelete() {
+      Vibration.vibrate(duration: 500);
+      var _isLoading = false;
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (ctx) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                elevation: 0,
+                title: _isLoading
+                    ? Text('')
+                    : Text(
+                        'Warning',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                backgroundColor: _isLoading ? Colors.transparent : Colors.red,
+                content: _isLoading
+                    ? Center(
+                        child: SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 9,
+                          ),
+                        ),
+                      )
+                    : Text('Are you sure you want to remove this Order?',
+                        style: TextStyle(color: Colors.white)),
+                actions: <Widget>[
+                  FlatButton(
+                      child: _isLoading
+                          ? Text('')
+                          : Text(
+                              'Delete',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                      onPressed: () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        try {
+                          await Provider.of<OrderHttps>(context, listen: false)
+                              .deleteOrder(widget.id, widget.custId);
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          Navigator.of(context).pop();
+                          Navigator.of(context)
+                              .pushNamed(OrderScreen.routeName);
+                        } catch (e) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+
+                          Navigator.of(context).pop();
+
+                          scaffold.showSnackBar(SnackBar(
+                            content: Text(
+                              'Deleting Failed!',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.red,
+                          ));
+                        }
+                      }),
+                  FlatButton(
+                    child: _isLoading
+                        ? Text('')
+                        : Text(
+                            'Cancel',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+    }
+
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
       actionExtentRatio: 0.25,
@@ -80,20 +179,32 @@ class _OrderAllTileState extends State<OrderAllTile> {
                         (prod) => Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text(
-                              prod.title,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                            Flexible(
+                              child: RichText(
+                                overflow: TextOverflow.fade,
+                                strutStyle: StrutStyle(fontSize: 12.0),
+                                text: TextSpan(
+                                  text: prod.title,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ),
-                            RichText(
-                              overflow: TextOverflow.fade,
-                              text: TextSpan(
-                                text:
-                                    '${prod.quantity.toStringAsFixed(0)}x   \$${prod.price.toStringAsFixed(2)}',
+                            Flexible(
+                              child: RichText(
+                                overflow: TextOverflow.fade,
+                                strutStyle: StrutStyle(fontSize: 12.0),
+                                text: TextSpan(
+                                  text:
+                                      '${prod.quantity.toStringAsFixed(0)}x   \$${prod.price.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                ),
                               ),
-                            )
+                            ),
                           ],
                         ),
                       )
@@ -110,13 +221,17 @@ class _OrderAllTileState extends State<OrderAllTile> {
           caption: 'Edit',
           color: Colors.orange,
           icon: Icons.edit,
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).pushNamed(EditOrderScreen.routeName,
+                arguments: [widget.id, 'edit']);
+          },
         ),
         IconSlideAction(
-            caption: 'Delete',
-            color: Colors.red,
-            icon: Icons.delete,
-            onTap: () {}),
+          caption: 'Delete',
+          color: Colors.red,
+          icon: Icons.delete,
+          onTap: _confirmDelete,
+        ),
       ],
     );
   }

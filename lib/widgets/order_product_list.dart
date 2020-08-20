@@ -13,28 +13,41 @@ class _OrderProductListState extends State<OrderProductList> {
   @override
   Widget build(BuildContext context) {
     final productList = Provider.of<AddingProductOrder>(context);
-    return Column(
-      children: <Widget>[
+    return Container(
+      width: double.infinity,
+      height: 300,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.all(
+          Radius.circular(
+            20,
+          ),
+        ),
+      ),
+      child: Column(children: <Widget>[
+        SizedBox(height: 4),
         Center(
           child: Text(
             ' Total: \$${productList.totalPrice().toStringAsFixed(2)}',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-        SizedBox(height: 20),
-        Container(
-          width: double.infinity,
-          height: 300,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.all(
-              Radius.circular(
-                20,
-              ),
+            style: TextStyle(
+              color: productList.totalPrice() < 0 ? Colors.red : Colors.black,
             ),
           ),
-          child: Padding(
-            padding: EdgeInsets.all(5),
+        ),
+        SizedBox(height: 8),
+        Padding(
+          padding: EdgeInsets.all(5),
+          child: Container(
+            width: double.infinity,
+            height: 250,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.all(
+                Radius.circular(
+                  20,
+                ),
+              ),
+            ),
             child: ListView.builder(
               itemCount: productList.items.length,
               itemBuilder: (_, i) => ProductTile(
@@ -46,7 +59,7 @@ class _OrderProductListState extends State<OrderProductList> {
             ),
           ),
         ),
-      ],
+      ]),
     );
   }
 }
@@ -95,6 +108,9 @@ class _ProductTileState extends State<ProductTile> {
         leading: Text('Qty:${widget.quantity.toStringAsFixed(0)}'),
         trailing: Text(
           widget.price.toStringAsFixed(2),
+          style: TextStyle(
+            color: widget.price < 0 ? Colors.red : Colors.black,
+          ),
         ),
       ),
     );

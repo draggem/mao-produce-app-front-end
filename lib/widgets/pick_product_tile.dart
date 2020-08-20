@@ -25,14 +25,40 @@ class PickProductTile extends StatefulWidget {
 }
 
 class _PickProductTileState extends State<PickProductTile> {
-  double editedQty = 1;
+  String editedQty = '1';
   bool _checked = false;
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('An Error Occured!'),
+        content: Text(message),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Okay'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+  bool isDouble(String value) {
+    if (value == null) {
+      return false;
+    }
+    print(double.parse(value, (e) => null) != null);
+    return double.parse(value, (e) => null) != null;
+  }
 
   @override
   Widget build(BuildContext context) {
     final addOrderProvider = Provider.of<AddingProductOrder>(context);
 
-    double editedPrice = widget.price;
+    String editedPrice = widget.price.toString();
 
     return Container(
       decoration: BoxDecoration(
@@ -50,18 +76,24 @@ class _PickProductTileState extends State<PickProductTile> {
         value: _checked,
         onChanged: (bool value) {
           setState(() {
-            _checked = value;
-            if (_checked) {
-              addOrderProvider.addOrder(
-                OrderProductModel(
-                  id: widget.id,
-                  quantity: editedQty,
-                  price: editedPrice,
-                  title: widget.title,
-                ),
-              );
+            if (!isDouble(editedPrice.toString()) ||
+                !isDouble(editedQty.toString())) {
+              _checked = false;
+              _showErrorDialog('Please enter a Numerical Value');
             } else {
-              addOrderProvider.removeProduct(widget.id);
+              _checked = value;
+              if (_checked) {
+                addOrderProvider.addOrder(
+                  OrderProductModel(
+                    id: widget.id,
+                    quantity: double.parse(editedQty),
+                    price: double.parse(editedPrice),
+                    title: widget.title,
+                  ),
+                );
+              } else {
+                addOrderProvider.removeProduct(widget.id);
+              }
             }
           });
         },
@@ -75,11 +107,10 @@ class _PickProductTileState extends State<PickProductTile> {
               child: TextFormField(
                 initialValue: widget.price.toStringAsFixed(2),
                 onChanged: (value) {
-                  editedPrice = double.parse(value);
-                  print(editedPrice);
+                  editedPrice = value;
                 },
-                keyboardType: TextInputType.number,
-                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                keyboardType: TextInputType.numberWithOptions(
+                    decimal: true, signed: true),
                 decoration: InputDecoration(
                   labelStyle: TextStyle(color: Colors.black),
                   labelText: '\$:',
@@ -92,7 +123,7 @@ class _PickProductTileState extends State<PickProductTile> {
             Expanded(
               child: TextFormField(
                 initialValue: widget.qty.toStringAsFixed(0),
-                onChanged: (value) => editedQty = double.parse(value),
+                onChanged: (value) => editedQty = value,
                 keyboardType: TextInputType.number,
                 inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
                 decoration: InputDecoration(

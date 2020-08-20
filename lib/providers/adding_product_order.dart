@@ -9,6 +9,19 @@ class AddingProductOrder with ChangeNotifier {
     return {..._items};
   }
 
+  get sign {
+    return signature;
+  }
+
+  //signature
+  var signature;
+
+  //add a signature
+  void addSign(var sign) {
+    signature = sign;
+    notifyListeners();
+  }
+
 //function to add product
   void addOrder(OrderProductModel order) {
     //checks if products is in the list or not
@@ -53,5 +66,12 @@ class AddingProductOrder with ChangeNotifier {
     );
 
     return price;
+  }
+
+  //clear order and signature
+  void clear() {
+    _items = {};
+    signature = null;
+    notifyListeners();
   }
 }

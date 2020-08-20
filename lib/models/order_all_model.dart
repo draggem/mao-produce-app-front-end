@@ -3,7 +3,7 @@ import 'order_model.dart';
 class OrderAllModel extends OrderModel {
   String custId;
   String custName;
-
+  Map<String, dynamic> signature = {'signature': '', 'signee': ''};
   OrderAllModel({
     id,
     totalPrice,
@@ -12,6 +12,7 @@ class OrderAllModel extends OrderModel {
     products,
     this.custId,
     this.custName,
+    this.signature,
   }) : super(
           id: id,
           totalPrice: totalPrice,
