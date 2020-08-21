@@ -63,16 +63,18 @@ class _SignaturePadState extends State<SignaturePad> {
                   RaisedButton(
                     onPressed: () async {
                       setState(() {
-                        svg = base64.encode(
-                          utf8.encode(
-                            control.toSvg(
-                              color: Colors.blueGrey,
-                              size: 2.0,
-                              maxSize: 15.0,
-                              type: SignatureDrawType.shape,
-                            ),
-                          ),
-                        );
+                        svg = base64
+                            .encode(
+                              utf8.encode(
+                                control.toSvg(
+                                  color: Colors.blueGrey,
+                                  size: 2.0,
+                                  maxSize: 15.0,
+                                  type: SignatureDrawType.shape,
+                                ),
+                              ),
+                            )
+                            .toString();
                       });
                       provider.addSign(svg);
                       Navigator.of(context).pop();

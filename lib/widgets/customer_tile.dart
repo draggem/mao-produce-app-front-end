@@ -127,12 +127,9 @@ class _CustomerTileState extends State<CustomerTile> {
         child: ListTile(
           onTap: () {
             if (CustomerScreen.isOrderAdding == true) {
-              var provider =
-                  Provider.of<AddingProductOrder>(context, listen: false);
-              provider.clear();
               Navigator.of(context).pushNamed(
                 EditOrderScreen.routeName,
-                arguments: widget.id,
+                arguments: [widget.id, 'selection'],
               );
             } else {
               return null;
@@ -171,7 +168,7 @@ class _CustomerTileState extends State<CustomerTile> {
                 icon: Icons.edit,
                 onTap: () {
                   Navigator.of(context).pushNamed(EditCustomerScreen.routeName,
-                      arguments: [widget.id, 'selection']);
+                      arguments: widget.id);
                 },
               )
             : Container(),
@@ -180,7 +177,7 @@ class _CustomerTileState extends State<CustomerTile> {
                 caption: 'Delete',
                 color: Colors.red,
                 icon: Icons.delete,
-                onTap: _confirmDelete,
+                onTap: () {},
               )
             : Container(),
       ],

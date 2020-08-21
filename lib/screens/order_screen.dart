@@ -145,6 +145,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                     dateTime: orderData.items[i].orderDate,
                                     isOpen: orderData.items[i].isOpen,
                                     totalPrice: orderData.items[i].totalPrice,
+                                    signature: orderData.items[i].signature,
                                     products: orderData.items[i].products
                                         .map(
                                           (prod) => OrderProductModel(

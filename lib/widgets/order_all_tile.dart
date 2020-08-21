@@ -3,10 +3,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
+import 'package:mao_produce/providers/adding_product_order.dart';
 import 'package:provider/provider.dart';
 import 'package:vibration/vibration.dart';
 
 import '../providers/order_https.dart';
+import '../providers/adding_product_order.dart';
 
 import '../screens/order_screen.dart';
 import '../screens/edit_order_screen.dart';
@@ -19,6 +21,7 @@ class OrderAllTile extends StatefulWidget {
   final DateTime dateTime;
   final bool isOpen;
   final List<dynamic> products;
+  final Map<String, String> signature;
 
   OrderAllTile({
     this.custId,
@@ -28,6 +31,7 @@ class OrderAllTile extends StatefulWidget {
     this.dateTime,
     this.isOpen,
     this.products,
+    this.signature,
   });
 
   @override
@@ -222,8 +226,16 @@ class _OrderAllTileState extends State<OrderAllTile> {
           color: Colors.orange,
           icon: Icons.edit,
           onTap: () {
-            Navigator.of(context).pushNamed(EditOrderScreen.routeName,
-                arguments: [widget.id, 'edit']);
+            //initialise provider
+            var provider =
+                Provider.of<AddingProductOrder>(context, listen: false);
+            //add products for selected order
+            provider.clear();
+            widget.products.forEach((element) => provider.addOrder(element));
+            provider.addSign(widget.signature['signature']);
+            List<String> arg = [widget.id, 'edit'];
+            Navigator.of(context)
+                .pushNamed(EditOrderScreen.routeName, arguments: arg);
           },
         ),
         IconSlideAction(

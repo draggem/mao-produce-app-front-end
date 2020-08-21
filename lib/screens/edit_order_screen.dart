@@ -23,8 +23,11 @@ class EditOrderScreen extends StatefulWidget {
 }
 
 class _EditOrderScreenState extends State<EditOrderScreen> {
-  String title = 'Add an Order';
-  bool _orderStatus;
+  bool isEditing;
+
+  String title;
+
+  bool _orderStatus = true;
 
   final _form = GlobalKey<FormState>();
 
@@ -57,7 +60,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
   @override
   void didChangeDependencies() {
     if (_isInit) {
-      final order = ModalRoute.of(context).settings.arguments as List;
+      final order = ModalRoute.of(context).settings.arguments as List<String>;
       if (order[1] == 'selection') {
         var _editedCustomer = Provider.of<CustomerHttps>(context, listen: false)
             .findById(order[0]);
@@ -67,7 +70,36 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
           'orderDate':
               DateFormat.yMMMMEEEEd().format(DateTime.now()).toString(),
         };
-      } else {}
+
+        //initialise title
+        title = 'Add an Order';
+        //initialise form as adding product
+        isEditing = false;
+      } else {
+        var selectedOrder =
+            Provider.of<OrderHttps>(context, listen: false).findById(order[0]);
+        _initValues = {
+          'custId': selectedOrder.custId,
+          'custName': selectedOrder.custName,
+          'id': order[0],
+          'isOpen': selectedOrder.isOpen,
+          'orderDate': DateFormat.yMMMMEEEEd()
+              .format(selectedOrder.orderDate)
+              .toString(),
+          'products': selectedOrder.products,
+          'totalPrice': selectedOrder.totalPrice,
+        };
+        _orderStatus = selectedOrder.isOpen;
+        signee = selectedOrder.signature['signee'] == null
+            ? ''
+            : selectedOrder.signature['signee'];
+
+        //initialise form as adding product
+        isEditing = true;
+
+        //initialise title for edit
+        title = 'Edit the Order of ${selectedOrder.custName}';
+      }
     }
     super.didChangeDependencies();
   }
@@ -119,8 +151,13 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
     _editedOrder.totalPrice = totalprice;
 
     try {
-      await Provider.of<OrderHttps>(context, listen: false)
-          .addOrder(_editedOrder, signature, signee);
+      if (!isEditing) {
+        await Provider.of<OrderHttps>(context, listen: false)
+            .addOrder(_editedOrder, signature, signee);
+      } else {
+        await Provider.of<OrderHttps>(context, listen: false)
+            .updateOrder(_editedOrder, signature, signee);
+      }
     } catch (error) {
       setState(() {
         _isLoading = false;
@@ -154,6 +191,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(_initValues['id']);
     bool isSign = false;
     var provider = Provider.of<AddingProductOrder>(context);
 
@@ -169,6 +207,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         centerTitle: true,
         elevation: 0,
         actions: <Widget>[
+          IconButton(icon: Icon(Icons.email), onPressed: () {}),
           IconButton(
             icon: Icon(Icons.check),
             onPressed: _saveForm,
@@ -213,7 +252,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                           _editedOrder = OrderAllModel(
                             custId: _initValues['custId'],
                             custName: value,
-                            id: _editedOrder.id,
+                            id: _initValues['id'],
                             isOpen: _editedOrder.isOpen,
                             orderDate: _editedOrder.orderDate,
                             products: _editedOrder.products,
@@ -248,7 +287,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                           _editedOrder = OrderAllModel(
                             custId: _initValues['custId'],
                             custName: _editedOrder.custName,
-                            id: _editedOrder.id,
+                            id: _initValues['id'],
                             isOpen: _editedOrder.isOpen,
                             orderDate: DateTime.now(),
                             products: _editedOrder.products,
@@ -278,7 +317,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                             _editedOrder = OrderAllModel(
                               custId: _initValues['custId'],
                               custName: _editedOrder.custName,
-                              id: _editedOrder.id,
+                              id: _initValues['id'],
                               isOpen: value,
                               orderDate: _editedOrder.orderDate,
                               products: _editedOrder.products,
@@ -308,6 +347,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                     SizedBox(height: 20),
 
                     TextFormField(
+                        initialValue: signee,
                         style: TextStyle(color: Colors.white),
                         cursorColor: Colors.white,
                         decoration: InputDecoration(
