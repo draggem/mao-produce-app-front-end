@@ -127,7 +127,7 @@ class OrderHttps with ChangeNotifier {
             );
           }
         }
-        fdafdsafdasfsda _items = loadedOrders;
+        _items = loadedOrders;
         notifyListeners();
       } else {
         notifyListeners();
