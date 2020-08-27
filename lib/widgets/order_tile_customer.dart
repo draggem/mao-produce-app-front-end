@@ -43,16 +43,18 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
                 leading: widget.isOpen == false
                     ? Icon(Icons.check_circle, color: Colors.pink, size: 50)
                     : Icon(Icons.adjust, color: Colors.black, size: 50),
-                title: Text(
-                  widget.id.substring(0, 6),
-                ),
+                title: Text(widget.id, maxLines: 1),
                 subtitle: Text(
                   DateFormat('dd/MM/yyyy').format(widget.dateTime).toString(),
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text('\$${widget.totalPrice.toStringAsFixed(2)}'),
+                    RichText(
+                      overflow: TextOverflow.fade,
+                      text: TextSpan(
+                          text: '\$${widget.totalPrice.toStringAsFixed(2)}'),
+                    ),
                     IconButton(
                       icon: Icon(
                           _expanded ? Icons.expand_less : Icons.expand_more),
@@ -77,18 +79,30 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
                         (prod) => Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text(
-                              prod.title,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                            Flexible(
+                              child: RichText(
+                                overflow: TextOverflow.fade,
+                                strutStyle: StrutStyle(fontSize: 12.0),
+                                text: TextSpan(
+                                  text: prod.title,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ),
-                            Text(
-                              '${prod.quantity.toStringAsFixed(0)}x   \$${prod.price.toStringAsFixed(2)}',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                            Flexible(
+                              child: RichText(
+                                overflow: TextOverflow.fade,
+                                strutStyle: StrutStyle(fontSize: 12.0),
+                                text: TextSpan(
+                                  text:
+                                      '${prod.quantity.toStringAsFixed(0)}x   \$${prod.price.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                ),
                               ),
                             ),
                           ],

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../providers/order_https.dart';
 import '../providers/recent_searches.dart';
+import '../providers/adding_product_order.dart';
 
 import '../models/order_product_model.dart';
 
@@ -184,6 +185,11 @@ class _OrderScreenState extends State<OrderScreen> {
       floatingActionButton: custId == " "
           ? FloatingActionButton(
               onPressed: () {
+                //initialise provider
+                var provider =
+                    Provider.of<AddingProductOrder>(context, listen: false);
+                //add products for selected order
+                provider.clear();
                 Navigator.of(context)
                     .pushNamed(CustomerScreen.routeName, arguments: true);
               },
