@@ -75,6 +75,7 @@ class OrderHttps with ChangeNotifier {
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Orders/$custId?isOpen=$isOpen';
 
     try {
+      _items = [];
       final response = await http.get(url);
 
       final List<OrderAllModel> loadedOrders = [];
