@@ -24,7 +24,6 @@ import './screens/searched_order_screen.dart';
 import './screens/edit_order_screen.dart';
 import './screens/signature_screen.dart';
 
-//This is the main
 void main() {
   runApp(MyApp());
 }
