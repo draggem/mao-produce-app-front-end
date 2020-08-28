@@ -30,9 +30,6 @@ class OrderHttps with ChangeNotifier {
     return [..._items];
   }
 
-  //variable initialise last filter request
-  bool lastFilter;
-
 //function that finds orders by id
   OrderAllModel findById(String id) {
     return _items.firstWhere((order) => order.id == id);
@@ -80,7 +77,6 @@ class OrderHttps with ChangeNotifier {
 
       final List<OrderAllModel> loadedOrders = [];
       final extractedData = json.decode(response.body);
-      final dataLength = extractedData.length;
 
       if (response.statusCode == 404) {
         print('no order ${extractedData['message']}');
@@ -95,44 +91,38 @@ class OrderHttps with ChangeNotifier {
         return;
       }
 
-      if (_items.length < dataLength || isOpen != lastFilter) {
-        //set lastFilter
-        lastFilter = isOpen;
-        for (var i = 0; i < extractedData.length; i++) {
-          if (extractedData[i]['id'] != null) {
-            loadedOrders.add(
-              OrderAllModel(
-                  id: extractedData[i]['id'],
-                  orderDate: DateTime.parse(extractedData[i]['datetime']),
-                  totalPrice: double.parse(extractedData[i]['totalprice']),
-                  isOpen: (extractedData[i]['isopen']),
-                  products: (extractedData[i]['products'] as List<dynamic>)
-                      .map(
-                        (item) => OrderProductModel(
-                          id: item['id'],
-                          quantity: double.parse(item['quantity']),
-                          price: double.parse(item['price']),
-                          title: item['title'],
-                        ),
-                      )
-                      .toList(),
-                  signature: {
-                    'signature':
-                        extractedData[i]['signature']['signature'] == null
-                            ? null
-                            : extractedData[i]['signature']['signature'],
-                    'signee': extractedData[i]['signature']['signee'] == null
-                        ? null
-                        : extractedData[i]['signature']['signee']
-                  }),
-            );
-          }
+      for (var i = 0; i < extractedData.length; i++) {
+        if (extractedData[i]['id'] != null) {
+          loadedOrders.add(
+            OrderAllModel(
+                id: extractedData[i]['id'],
+                orderDate: DateTime.parse(extractedData[i]['datetime']),
+                totalPrice: double.parse(extractedData[i]['totalprice']),
+                isOpen: (extractedData[i]['isopen']),
+                products: (extractedData[i]['products'] as List<dynamic>)
+                    .map(
+                      (item) => OrderProductModel(
+                        id: item['id'],
+                        quantity: double.parse(item['quantity']),
+                        price: double.parse(item['price']),
+                        title: item['title'],
+                      ),
+                    )
+                    .toList(),
+                signature: {
+                  'signature':
+                      extractedData[i]['signature']['signature'] == null
+                          ? null
+                          : extractedData[i]['signature']['signature'],
+                  'signee': extractedData[i]['signature']['signee'] == null
+                      ? null
+                      : extractedData[i]['signature']['signee']
+                }),
+          );
         }
-        _items = loadedOrders;
-        notifyListeners();
-      } else {
-        notifyListeners();
       }
+      _items = loadedOrders;
+      notifyListeners();
     } catch (e) {
       print(e.toString());
     }
@@ -147,7 +137,6 @@ class OrderHttps with ChangeNotifier {
       final response = await http.get(url);
       final List<OrderAllModel> loadedOrders = [];
       final extractedData = json.decode(response.body);
-      final dataLength = extractedData.length;
 
       if (response.statusCode == 404) {
         print('no order ${extractedData['message']}');
@@ -162,42 +151,36 @@ class OrderHttps with ChangeNotifier {
         return;
       }
 
-      if (_items.length < dataLength || isOpen != lastFilter) {
-        //set lastFilter
-        lastFilter = isOpen;
-        for (var i = 0; i < extractedData.length; i++) {
-          if (extractedData[i]['id'] != null) {
-            loadedOrders.add(
-              OrderAllModel(
-                  custId: extractedData[i]['customerid'],
-                  custName: extractedData[i]['customername'],
-                  id: extractedData[i]['id'],
-                  orderDate: DateTime.parse(extractedData[i]['datetime']),
-                  totalPrice: double.parse(extractedData[i]['totalprice']),
-                  isOpen: (extractedData[i]['isopen']),
-                  products: (extractedData[i]['products'] as List<dynamic>)
-                      .map(
-                        (item) => OrderProductModel(
-                          id: item['id'],
-                          quantity: double.parse(item['quantity']),
-                          price: double.parse(item['price']),
-                          title: item['title'],
-                        ),
-                      )
-                      .toList(),
-                  signature: {
-                    'signature': extractedData[i]['signature']['signature'],
-                    'signee': extractedData[i]['signature']['signee']
-                  }),
-            );
-          }
+      for (var i = 0; i < extractedData.length; i++) {
+        if (extractedData[i]['id'] != null) {
+          loadedOrders.add(
+            OrderAllModel(
+                custId: extractedData[i]['customerid'],
+                custName: extractedData[i]['customername'],
+                id: extractedData[i]['id'],
+                orderDate: DateTime.parse(extractedData[i]['datetime']),
+                totalPrice: double.parse(extractedData[i]['totalprice']),
+                isOpen: (extractedData[i]['isopen']),
+                products: (extractedData[i]['products'] as List<dynamic>)
+                    .map(
+                      (item) => OrderProductModel(
+                        id: item['id'],
+                        quantity: double.parse(item['quantity']),
+                        price: double.parse(item['price']),
+                        title: item['title'],
+                      ),
+                    )
+                    .toList(),
+                signature: {
+                  'signature': extractedData[i]['signature']['signature'],
+                  'signee': extractedData[i]['signature']['signee']
+                }),
+          );
         }
-
-        _items = loadedOrders;
-        notifyListeners();
-      } else {
-        notifyListeners();
       }
+
+      _items = loadedOrders;
+      notifyListeners();
     } catch (e) {
       print(e.toString());
     }

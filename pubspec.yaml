@@ -21,9 +21,9 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 flutter_icons:
-  android: "launcher_icon"
+  android: true
   ios: true
-  image_path: "assets/img/maoproduceLogo.png"
+  image_path: "assets/img/mao_icon.png"
 
 dependencies:
   flutter:
@@ -59,12 +59,11 @@ flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/img/maoproduceLogo.png
+    - assets/img/mao_icon.png
     - assets/img/maoProduceLeaf.png
     - assets/img/maoProduceText.png
     - assets/img/MenuLogo.png
     - assets/img/NoOrder.gif
-    - assets/img/LoadingLogo.gif
     - assets/img/LoadingCartoon.gif
     - assets/img/LoadingCartoon1.gif
 

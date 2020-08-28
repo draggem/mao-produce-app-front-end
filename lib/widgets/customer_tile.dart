@@ -127,6 +127,11 @@ class _CustomerTileState extends State<CustomerTile> {
         child: ListTile(
           onTap: () {
             if (CustomerScreen.isOrderAdding == true) {
+              //initialise provider
+              var provider =
+                  Provider.of<AddingProductOrder>(context, listen: false);
+              //add products for selected order
+              provider.clear();
               Navigator.of(context).pushNamed(
                 EditOrderScreen.routeName,
                 arguments: [widget.id, 'selection'],

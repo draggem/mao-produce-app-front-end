@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:vibration/vibration.dart';
 
 import '../widgets/order_product_list.dart';
 
@@ -189,6 +190,95 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
     );
   }
 
+  void _sendEmail() {
+    Vibration.vibrate(duration: 500);
+    var _isLoading = false;
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              elevation: 0,
+              title: _isLoading
+                  ? Text('')
+                  : Text(
+                      'Attention',
+                      style: TextStyle(color: Colors.white),
+                    ),
+              backgroundColor: _isLoading ? Colors.transparent : Colors.orange,
+              content: _isLoading
+                  ? Center(
+                      child: SizedBox(
+                        height: 100,
+                        width: 100,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 9,
+                        ),
+                      ),
+                    )
+                  : Text('This will send an email to the customer',
+                      style: TextStyle(color: Colors.white)),
+              actions: <Widget>[
+                FlatButton(
+                    child: _isLoading
+                        ? Text('')
+                        : Text(
+                            'Delete',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                    onPressed: () async {
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      try {
+                        // await Provider.of<CustomerHttps>(context, listen: false)
+                        //     .deleteCustomer(widget.id);
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pushNamed(OrderScreen.routeName);
+                      } catch (e) {
+                        setState(() {
+                          _isLoading = false;
+                        });
+
+                        Navigator.of(context).pop();
+
+                        final scaffold = Scaffold.of(context);
+                        scaffold.showSnackBar(SnackBar(
+                          content: Text(
+                            'Sending Failed!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Colors.red,
+                        ));
+                      }
+                    }),
+                FlatButton(
+                  child: _isLoading
+                      ? Text('')
+                      : Text(
+                          'Cancel',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     print(_initValues['id']);
@@ -207,7 +297,10 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         centerTitle: true,
         elevation: 0,
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.email), onPressed: () {}),
+          IconButton(
+            icon: Icon(Icons.email),
+            onPressed: _sendEmail,
+          ),
           IconButton(
             icon: Icon(Icons.check),
             onPressed: _saveForm,
