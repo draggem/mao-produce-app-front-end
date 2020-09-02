@@ -155,10 +155,7 @@ class _OrderAllTileState extends State<OrderAllTile> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    RichText(
-                      overflow: TextOverflow.fade,
-                      text: TextSpan(text: widget.id),
-                    ),
+                    Text(widget.id),
                     IconButton(
                       icon: Icon(
                           _expanded ? Icons.expand_less : Icons.expand_more),

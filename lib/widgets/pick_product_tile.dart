@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:vibration/vibration.dart';
 
 import '../models/order_product_model.dart';
+
+import '../widgets/dialogue_widget.dart';
 
 import '../providers/adding_product_order.dart';
 
@@ -46,6 +49,22 @@ class _PickProductTileState extends State<PickProductTile> {
     );
   }
 
+  void _confirmAdd() {
+    Vibration.vibrate(duration: 500);
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (ctx) => DialogueWidget(
+              ctx: context,
+              bgColor: Theme.of(context).primaryColor,
+              btnMsg: 'Confirm',
+              isForm: true,
+              msg: 'Please confirm the quantity',
+              textColor: Colors.white,
+              title: 'Product Confirmation',
+            ));
+  }
+
   bool isDouble(String value) {
     if (value == null) {
       return false;
@@ -75,27 +94,11 @@ class _PickProductTileState extends State<PickProductTile> {
       child: CheckboxListTile(
         value: _checked,
         onChanged: (bool value) {
+          var preValue = _checked;
           setState(() {
-            if (!isDouble(editedPrice.toString()) ||
-                !isDouble(editedQty.toString())) {
-              _checked = false;
-              _showErrorDialog('Please enter a Numerical Value');
-            } else {
-              _checked = value;
-              if (_checked) {
-                addOrderProvider.addOrder(
-                  OrderProductModel(
-                    id: widget.id,
-                    quantity: double.parse(editedQty),
-                    price: double.parse(editedPrice),
-                    title: widget.title,
-                  ),
-                );
-              } else {
-                addOrderProvider.removeProduct(widget.id);
-              }
-            }
+            _checked = value;
           });
+          preValue ? addOrderProvider.removeProduct(widget.id) : _confirmAdd();
         },
         title: Padding(
           padding: EdgeInsets.only(top: 5),
