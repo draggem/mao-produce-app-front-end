@@ -56,7 +56,7 @@ class _ProductScreenState extends State<ProductScreen> {
         actions: <Widget>[
           ProductScreen.isProductAdding == true
               ? IconButton(
-                  icon: Icon(Icons.add),
+                  icon: Icon(Icons.arrow_back),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },

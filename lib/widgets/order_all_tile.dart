@@ -228,7 +228,7 @@ class _OrderAllTileState extends State<OrderAllTile> {
                 Provider.of<AddingProductOrder>(context, listen: false);
             //add products for selected order
             provider.clear();
-            widget.products.forEach((element) => provider.addOrder(element));
+            widget.products.forEach((element) => provider.addProduct(element));
             provider.addSign(widget.signature['signature']);
             List<String> arg = [widget.id, 'edit'];
             Navigator.of(context)
