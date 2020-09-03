@@ -23,7 +23,7 @@ class AddingProductOrder with ChangeNotifier {
   }
 
 //function to add product
-  void addOrder(OrderProductModel order) {
+  void addProduct(OrderProductModel order) {
     //checks if products is in the list or not
     if (_items.containsKey(order.id)) {
       _items.update(

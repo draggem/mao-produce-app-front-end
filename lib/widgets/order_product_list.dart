@@ -25,12 +25,14 @@ class _OrderProductListState extends State<OrderProductList> {
         ),
       ),
       child: Column(children: <Widget>[
-        SizedBox(height: 4),
+        SizedBox(height: 8),
         Center(
           child: Text(
             ' Total: \$${productList.totalPrice().toStringAsFixed(2)}',
             style: TextStyle(
               color: productList.totalPrice() < 0 ? Colors.red : Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
             ),
           ),
         ),
