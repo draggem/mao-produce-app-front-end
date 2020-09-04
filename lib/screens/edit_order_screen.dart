@@ -32,25 +32,25 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
 
   final _form = GlobalKey<FormState>();
 
-  var _editedOrder = OrderAllModel(
-    custId: '',
-    custName: '',
-    id: '',
-    isOpen: false,
-    orderDate: DateTime.now(),
-    products: null,
-    totalPrice: null,
-  );
-
   var _initValues = {
     'custId': '',
     'custName': '',
     'id': null,
     'isOpen': true,
-    'orderDate': DateFormat.yMMMMEEEEd().format(DateTime.now()).toString(),
+    'orderDate': '',
     'products': '',
     'totalPrice': '',
   };
+
+  var _editedOrder = OrderAllModel(
+    custId: '',
+    custName: '',
+    id: '',
+    isOpen: false,
+    orderDate: null,
+    products: null,
+    totalPrice: null,
+  );
 
   //person who's signed
   var signee;
@@ -71,6 +71,9 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
           'orderDate':
               DateFormat.yMMMMEEEEd().format(DateTime.now()).toString(),
         };
+
+        //initialize order date
+        _editedOrder.orderDate = DateTime.now();
 
         //initialise title
         title = 'Add an Order';
@@ -100,12 +103,15 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
 
         //initialise title for edit
         title = 'Edit the Order of ${selectedOrder.custName}';
+
+        //initialise order date if order is under edit
+        _editedOrder.orderDate = selectedOrder.orderDate;
       }
     }
     super.didChangeDependencies();
   }
 
-  Future<void> _saveForm() async {
+  Future<void> _saveForm(bool isEmail) async {
     final productListProv =
         Provider.of<AddingProductOrder>(context, listen: false);
 
@@ -152,12 +158,15 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
     _editedOrder.totalPrice = totalprice;
 
     try {
-      if (!isEditing) {
+      if (!isEditing && !isEmail) {
         await Provider.of<OrderHttps>(context, listen: false)
             .addOrder(_editedOrder, signature, signee);
-      } else {
+      } else if (isEditing && !isEmail) {
         await Provider.of<OrderHttps>(context, listen: false)
             .updateOrder(_editedOrder, signature, signee);
+      } else {
+        await Provider.of<OrderHttps>(context, listen: false)
+            .sendEmail(_editedOrder, signature, signee, isEditing);
       }
     } catch (error) {
       setState(() {
@@ -225,40 +234,14 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                     child: _isLoading
                         ? Text('')
                         : Text(
-                            'Delete',
+                            'Confirm',
                             style: TextStyle(
                               color: Colors.white,
                             ),
                           ),
-                    onPressed: () async {
-                      setState(() {
-                        _isLoading = true;
-                      });
-                      try {
-                        // await Provider.of<CustomerHttps>(context, listen: false)
-                        //     .deleteCustomer(widget.id);
-                        setState(() {
-                          _isLoading = false;
-                        });
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pushNamed(OrderScreen.routeName);
-                      } catch (e) {
-                        setState(() {
-                          _isLoading = false;
-                        });
-
-                        Navigator.of(context).pop();
-
-                        final scaffold = Scaffold.of(context);
-                        scaffold.showSnackBar(SnackBar(
-                          content: Text(
-                            'Sending Failed!',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          backgroundColor: Colors.red,
-                        ));
-                      }
+                    onPressed: () {
+                      _saveForm(true);
+                      Navigator.of(context).pop();
                     }),
                 FlatButton(
                   child: _isLoading
@@ -303,7 +286,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
           ),
           IconButton(
             icon: Icon(Icons.check),
-            onPressed: _saveForm,
+            onPressed: () => _saveForm(false),
           ),
         ],
       ),
@@ -382,7 +365,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                             custName: _editedOrder.custName,
                             id: _initValues['id'],
                             isOpen: _editedOrder.isOpen,
-                            orderDate: DateTime.now(),
+                            orderDate: _editedOrder.orderDate,
                             products: _editedOrder.products,
                             totalPrice: _editedOrder.totalPrice,
                           );

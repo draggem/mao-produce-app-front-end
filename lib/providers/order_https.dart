@@ -186,10 +186,79 @@ class OrderHttps with ChangeNotifier {
     }
   }
 
+  //Email Function for adding orders
+  Future<void> sendEmail(
+      OrderAllModel order, var signature, String signee, bool isEditing) async {
+    bool editing = isEditing;
+    var orderIndex;
+    var response;
+    var url =
+        'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Send/${order.custId}';
+
+    //check if it is editing
+    if (editing || order.id != null) {
+      print(editing);
+      print(order.id);
+      url += '?orderId=${order.id}';
+      orderIndex = _items.indexWhere((prod) => prod.id == order.id);
+      if (orderIndex >= 0) {
+        editing = false;
+      }
+    }
+
+    try {
+      response = await http.post(url,
+          headers: {'Content-Type': 'applications/json'},
+          body: json.encode({
+            'customerid': order.custId,
+            'customername': order.custName,
+            'id': order.id,
+            'datetime': order.orderDate.toString(),
+            'totalprice': order.totalPrice,
+            'isopen': order.isOpen,
+            'products': order.products
+                .map((item) => {
+                      'id': item.id,
+                      'quantity': item.quantity,
+                      'price': item.price,
+                      'title': item.title,
+                    })
+                .toList(),
+            'signature': {
+              'signature': signature == null || signee == null
+                  ? ''
+                  : signature.toString(),
+              'signee': signee == null || signature == null ? '' : signee,
+            }
+          }));
+    } catch (e) {
+      throw e;
+    }
+    print(response.statusCode);
+    if (editing) {
+      _items[orderIndex] = order;
+    } else {
+      //add order if it is not editing
+      final extractedResponse = json.decode(response.body);
+      final orderId = extractedResponse['orderId'];
+      final newOrder = OrderAllModel(
+        id: orderId,
+        custId: order.custId,
+        custName: order.custName,
+        isOpen: order.isOpen,
+        orderDate: DateTime.now(),
+        products: order.products,
+        totalPrice: order.totalPrice,
+      );
+      _items.add(newOrder);
+    }
+
+    notifyListeners();
+  }
+
   //update order function
   Future<void> updateOrder(
       OrderAllModel order, var signature, String signee) async {
-    print(_items);
     try {
       final orderIndex = _items.indexWhere((prod) => prod.id == order.id);
 
@@ -219,7 +288,6 @@ class OrderHttps with ChangeNotifier {
               }
             }));
 
-        print(json.decode(response.body));
         _items[orderIndex] = order;
         notifyListeners();
       } else {
@@ -269,10 +337,7 @@ class OrderHttps with ChangeNotifier {
       );
 
       final extractedResponse = json.decode(response.body);
-
-      print(extractedResponse);
       final orderId = extractedResponse['orderId'];
-      print(orderId);
 
       final newOrder = OrderAllModel(
         id: orderId,

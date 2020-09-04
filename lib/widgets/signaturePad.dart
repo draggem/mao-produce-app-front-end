@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:hand_signature/signature.dart';
 import 'package:provider/provider.dart';
@@ -18,8 +21,10 @@ class _SignaturePadState extends State<SignaturePad> {
   );
 
 //svg base64 code
-  var svg;
-
+  var encoded;
+  //image
+  ValueNotifier<ByteData> rawImage = ValueNotifier<ByteData>(null);
+  ByteData rawImageByte;
   @override
   Widget build(BuildContext context) {
     //adding order provider
@@ -56,36 +61,38 @@ class _SignaturePadState extends State<SignaturePad> {
               ),
               Row(
                 children: <Widget>[
-                  RaisedButton(
+                  FlatButton(
                     onPressed: control.clear,
-                    child: Text('Clear'),
+                    child: Text('Clear', style: TextStyle(color: Colors.white)),
                   ),
-                  RaisedButton(
+                  FlatButton(
                     onPressed: () async {
-                      setState(() {
-                        svg = base64
-                            .encode(
-                              utf8.encode(
-                                control.toSvg(
-                                  color: Colors.blueGrey,
-                                  size: 2.0,
-                                  maxSize: 15.0,
-                                  type: SignatureDrawType.shape,
-                                ),
-                              ),
-                            )
-                            .toString();
-                      });
-                      provider.addSign(svg);
+                      rawImage.value = await control.toImage(
+                        color: Colors.blueGrey,
+                        format: ImageByteFormat.png,
+                      );
+
+                      encoded = base64
+                          .encode(rawImage.value.buffer.asUint8List())
+                          .toString();
+
+                      print(encoded);
+                      provider.addSign(encoded);
                       Navigator.of(context).pop();
                     },
-                    child: Text('Save'),
+                    child: Text(
+                      'Save',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-                  RaisedButton(
+                  FlatButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text('Cancel'),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
