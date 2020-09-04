@@ -61,11 +61,11 @@ class _SignaturePadState extends State<SignaturePad> {
               ),
               Row(
                 children: <Widget>[
-                  RaisedButton(
+                  FlatButton(
                     onPressed: control.clear,
-                    child: Text('Clear'),
+                    child: Text('Clear', style: TextStyle(color: Colors.white)),
                   ),
-                  RaisedButton(
+                  FlatButton(
                     onPressed: () async {
                       rawImage.value = await control.toImage(
                         color: Colors.blueGrey,
@@ -80,13 +80,19 @@ class _SignaturePadState extends State<SignaturePad> {
                       provider.addSign(encoded);
                       Navigator.of(context).pop();
                     },
-                    child: Text('Save'),
+                    child: Text(
+                      'Save',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-                  RaisedButton(
+                  FlatButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text('Cancel'),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
