@@ -60,53 +60,49 @@ class ProductHttps with ChangeNotifier {
         return;
       }
 
-      if (_items.length < dataLength) {
-        for (var i = 0; i < dataLength; i++) {
-          if (extractedData[i]['title'] != null ||
-              extractedData[i]['price'] != null) {
+      for (var i = 0; i < dataLength; i++) {
+        if (extractedData[i]['title'] != null ||
+            extractedData[i]['price'] != null) {
 //grab the img Url
-            String imgUrl = extractedData[i]['imageurl'];
+          String imgUrl = extractedData[i]['imageurl'];
 
-            if (imgUrl != null) {
-              //pattern to check expression
-              var urlPattern =
-                  r"(https?|http)://([-A-Z0-9.]+)(/[-A-Z0-9+&@#/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#/%=~_|!:‌​,.;]*)?";
-              var match =
-                  new RegExp(urlPattern, caseSensitive: false).hasMatch(imgUrl);
+          if (imgUrl != null) {
+            //pattern to check expression
+            var urlPattern =
+                r"(https?|http)://([-A-Z0-9.]+)(/[-A-Z0-9+&@#/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#/%=~_|!:‌​,.;]*)?";
+            var match =
+                new RegExp(urlPattern, caseSensitive: false).hasMatch(imgUrl);
 
-              //checks if pattern matches or if it actually is a valid link
-              if (match == true) {
-                //check img link response
-                final imgUrlResponse = await http.head(imgUrl);
+            //checks if pattern matches or if it actually is a valid link
+            if (match == true) {
+              //check img link response
+              final imgUrlResponse = await http.head(imgUrl);
 
-                if (imgUrlResponse.statusCode != 200) {
-                  imgUrl = '';
-                }
-              } else {
+              if (imgUrlResponse.statusCode != 200) {
                 imgUrl = '';
               }
             } else {
               imgUrl = '';
             }
-
-            //Validate the image url link
-
-            loadedProducts.add(
-              ProductsModel(
-                  id: extractedData[i]['id'],
-                  title: extractedData[i]['title'],
-                  price: double.parse(extractedData[i]['price']),
-                  url: imgUrl),
-            );
+          } else {
+            imgUrl = '';
           }
+
+          //Validate the image url link
+
+          loadedProducts.add(
+            ProductsModel(
+                id: extractedData[i]['id'],
+                title: extractedData[i]['title'],
+                price: double.parse(extractedData[i]['price']),
+                url: imgUrl),
+          );
         }
-
-        _items = loadedProducts;
-
-        notifyListeners();
-      } else {
-        notifyListeners();
       }
+
+      _items = loadedProducts;
+
+      notifyListeners();
     } catch (e) {
       throw (e);
     }
