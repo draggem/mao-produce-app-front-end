@@ -107,7 +107,7 @@ class _ProductTileState extends State<ProductTile> {
       },
       child: ListTile(
         title: Text(widget.title),
-        leading: Text('Qty:${widget.quantity.toStringAsFixed(0)}'),
+        leading: Text('${widget.quantity.toStringAsFixed(0)}'),
         trailing: Text(
           widget.price.toStringAsFixed(2),
           style: TextStyle(

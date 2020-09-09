@@ -96,6 +96,7 @@ class _FormDialogState extends State<FormDialog> {
   @override
   Widget build(BuildContext context) {
     final scaffold = Scaffold.of(widget.context);
+    final provider = Provider.of<AddingProductOrder>(context, listen: false);
     return AlertDialog(
         elevation: 0,
         title: _isLoading
@@ -103,7 +104,20 @@ class _FormDialogState extends State<FormDialog> {
             : Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Text('Confirm Product'),
+                  Column(children: <Widget>[
+                    Text(widget.title, overflow: TextOverflow.fade),
+                    provider.isProductAdded(widget.id) == true
+                        ? Text(
+                            'this product has already been added',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.fade,
+                          )
+                        : Text('')
+                  ]),
                   IconButton(
                       icon: Icon(Icons.close, color: Colors.white),
                       onPressed: () => Navigator.of(context).pop())

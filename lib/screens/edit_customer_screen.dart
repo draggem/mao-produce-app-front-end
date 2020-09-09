@@ -121,7 +121,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
       setState(() {
         _isLoading = false;
       });
-      Navigator.of(context).pushNamed(CustomerScreen.routeName);
+      Navigator.of(context).pushReplacementNamed(CustomerScreen.routeName);
     }
   }
 
