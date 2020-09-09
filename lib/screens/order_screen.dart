@@ -339,9 +339,7 @@ class DataSearch extends SearchDelegate<String> {
             onTap: () {
               final searchedData = [
                 suggestionList[index],
-                _OrderScreenState.custName == " "
-                    ? 'customerOrder '
-                    : 'allOrder'
+                _OrderScreenState.custName == " " ? 'customerOrder' : 'allOrder'
               ];
               Navigator.of(context).pushNamed(SearchedOrderScreen.routeName,
                   arguments: searchedData);

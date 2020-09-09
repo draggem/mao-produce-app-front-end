@@ -62,6 +62,15 @@ class _SignaturePadState extends State<SignaturePad> {
               Row(
                 children: <Widget>[
                   FlatButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  FlatButton(
                     onPressed: control.clear,
                     child: Text('Clear', style: TextStyle(color: Colors.white)),
                   ),
@@ -82,15 +91,6 @@ class _SignaturePadState extends State<SignaturePad> {
                     },
                     child: Text(
                       'Save',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  FlatButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'Cancel',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),

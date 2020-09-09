@@ -160,7 +160,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       setState(() {
         _isLoading = false;
       });
-      Navigator.of(context).pushNamed(ProductScreen.routeName);
+      Navigator.of(context).pushReplacementNamed(ProductScreen.routeName);
     }
   }
 

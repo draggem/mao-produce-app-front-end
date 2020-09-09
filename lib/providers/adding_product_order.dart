@@ -74,4 +74,13 @@ class AddingProductOrder with ChangeNotifier {
     signature = null;
     notifyListeners();
   }
+
+  //check if a product is already added
+  bool isProductAdded(String id) {
+    if (_items.containsKey(id)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

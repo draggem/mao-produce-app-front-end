@@ -74,7 +74,6 @@ class _SearchedOrderScreenState extends State<SearchedOrderScreen> {
             }
             break;
         }
-        return null;
       }()),
     );
   }
