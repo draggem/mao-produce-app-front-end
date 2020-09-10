@@ -203,6 +203,41 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
     );
   }
 
+  void _warningMsg() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Warning', style: TextStyle(color: Colors.white)),
+        content: Text(
+          'Any products added will not be saved',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.red,
+        actions: <Widget>[
+          FlatButton(
+            child: Text(
+              'Go Back',
+              style: TextStyle(color: Colors.white),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            },
+          ),
+          FlatButton(
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
+
   void _sendEmail() {
     Vibration.vibrate(duration: 500);
     var _isLoading = false;
@@ -278,6 +313,10 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
       });
     }
     return ScaffoldBody(
+      appBarLeading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: _warningMsg,
+      ),
       elevation: 0,
       scaffoldBackground: Theme.of(context).primaryColor,
       title: title,
