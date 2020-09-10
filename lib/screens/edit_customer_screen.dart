@@ -8,6 +8,8 @@ import '../providers/customer_https.dart';
 
 import '../screens/customer_screen.dart';
 
+import '../widgets/scaffold_body.dart';
+
 class EditCustomerScreen extends StatefulWidget {
   static const routeName = '/edit-customer';
 
@@ -145,16 +147,14 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.check),
-            onPressed: _saveForm,
-          ),
-        ],
-      ),
+    return ScaffoldBody(
+      title: title,
+      actions: [
+        IconButton(
+          icon: Icon(Icons.check),
+          onPressed: _saveForm,
+        )
+      ],
       body: _isLoading
           ? Center(
               child: CircularProgressIndicator(),
