@@ -8,6 +8,8 @@ import '../providers/customer_https.dart';
 
 import '../screens/customer_screen.dart';
 
+import '../widgets/scaffold_body.dart';
+
 class EditCustomerScreen extends StatefulWidget {
   static const routeName = '/edit-customer';
 
@@ -46,6 +48,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
   var _isLoading = false;
 
 //Dispose focus nodes avoiding simultaneous focus
+  @override
   void dispose() {
     _emailFocusNode.dispose();
     _addressFocusNode.dispose();
@@ -106,7 +109,6 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
       setState(() {
         _isLoading = false;
       });
-      Navigator.of(context).pushNamed(CustomerScreen.routeName);
     } else {
       try {
         await Provider.of<CustomerHttps>(context, listen: false)
@@ -121,8 +123,11 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
       setState(() {
         _isLoading = false;
       });
-      Navigator.of(context).pushReplacementNamed(CustomerScreen.routeName);
     }
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      CustomerScreen.routeName,
+      ModalRoute.withName(CustomerScreen.routeName),
+    );
   }
 
   void _showErrorDialog(String message) {
@@ -145,16 +150,14 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.check),
-            onPressed: _saveForm,
-          ),
-        ],
-      ),
+    return ScaffoldBody(
+      title: title,
+      actions: [
+        IconButton(
+          icon: Icon(Icons.check),
+          onPressed: _saveForm,
+        )
+      ],
       body: _isLoading
           ? Center(
               child: CircularProgressIndicator(),

@@ -23,7 +23,7 @@ environment:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/img/mao_icon.png"
+  image_path: "assets/img/mao_icon_ios.png"
 
 dependencies:
   flutter:

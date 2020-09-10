@@ -8,6 +8,8 @@ import '../providers/product_https.dart';
 
 import '../screens/product_screen.dart';
 
+import '../widgets/scaffold_body.dart';
+
 class EditProductScreen extends StatefulWidget {
   static const routeName = '/edit-product';
 
@@ -143,7 +145,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
       setState(() {
         _isLoading = false;
       });
-      Navigator.of(context).pushNamed(ProductScreen.routeName);
     } else {
       //call Add product
       try {
@@ -160,19 +161,20 @@ class _EditProductScreenState extends State<EditProductScreen> {
       setState(() {
         _isLoading = false;
       });
-      Navigator.of(context).pushReplacementNamed(ProductScreen.routeName);
     }
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      ProductScreen.routeName,
+      ModalRoute.withName(ProductScreen.routeName),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.check), onPressed: _saveForm),
-        ],
-      ),
+    return ScaffoldBody(
+      title: title,
+      actions: [
+        IconButton(icon: Icon(Icons.check), onPressed: _saveForm),
+      ],
       body: _isLoading
           ? Center(
               child: CircularProgressIndicator(),

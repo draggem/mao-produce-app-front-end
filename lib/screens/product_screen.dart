@@ -54,14 +54,6 @@ class _ProductScreenState extends State<ProductScreen> {
         centerTitle: true,
         title: Text(title),
         actions: <Widget>[
-          ProductScreen.isProductAdding == true
-              ? IconButton(
-                  icon: Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              : Container(),
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () {
@@ -70,7 +62,7 @@ class _ProductScreenState extends State<ProductScreen> {
           ),
         ],
       ),
-      drawer: AppDrawer(),
+      drawer: ProductScreen.isProductAdding == true ? null : AppDrawer(),
       body: FutureBuilder(
         future: _refreshProducts(context),
         builder: (ctx, snapshot) => snapshot.connectionState ==

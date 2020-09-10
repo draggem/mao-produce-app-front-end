@@ -7,6 +7,7 @@ import '../providers/recent_searches.dart';
 
 import '../widgets/app_drawer.dart';
 import '../widgets/customer_tile.dart';
+import '../widgets/scaffold_body.dart';
 
 import 'searched_item_screen.dart';
 
@@ -64,21 +65,24 @@ class _CustomerScreenState extends State<CustomerScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(title),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              showSearch(context: context, delegate: DataSearch());
-            },
-          )
-        ],
-      ),
-      drawer: AppDrawer(),
+    return ScaffoldBody(
+      centerTitle: true,
+      title: title,
+      actions: [
+        IconButton(
+          icon: Icon(Icons.search),
+          onPressed: () {
+            showSearch(context: context, delegate: DataSearch());
+          },
+        )
+      ],
+      drawer: CustomerScreen.isOrderAdding == true ? null : AppDrawer(),
       body: FutureBuilder(
         future: _refreshCustomers(context),
         builder: (ctx, snapshot) =>
