@@ -120,18 +120,14 @@ class _CustomerTileState extends State<CustomerTile> {
     }
 
     return Slidable(
+      enabled: CustomerScreen.isOrderAdding ? false : true,
       actionPane: SlidableDrawerActionPane(),
       actionExtentRatio: 0.25,
       child: Container(
         color: Colors.white,
         child: ListTile(
           onTap: () {
-            if (CustomerScreen.isOrderAdding == true) {
-              //initialise provider
-              var provider =
-                  Provider.of<AddingProductOrder>(context, listen: false);
-              //add products for selected order
-              provider.clear();
+            if (CustomerScreen.isOrderAdding) {
               Navigator.of(context).pushNamed(
                 EditOrderScreen.routeName,
                 arguments: [widget.id, 'selection'],
