@@ -35,7 +35,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
     //Hides the top status bar for androids.
-    SystemChrome.setEnabledSystemUIOverlays([]);
+    // SystemChrome.setEnabledSystemUIOverlays([]);
 
     //return the SignaturePad widget
     return Scaffold(

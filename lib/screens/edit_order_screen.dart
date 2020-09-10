@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:vibration/vibration.dart';
 
 import '../widgets/order_product_list.dart';
+import '../widgets/scaffold_body.dart';
 
 import '../screens/product_screen.dart';
 import '../screens/order_screen.dart';
@@ -178,7 +179,10 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
     setState(() {
       _isLoading = false;
     });
-    Navigator.of(context).pushReplacementNamed(OrderScreen.routeName);
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      OrderScreen.routeName,
+      ModalRoute.withName(OrderScreen.routeName),
+    );
   }
 
   void _showErrorDialog(String message) {
@@ -273,23 +277,21 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         isSign = true;
       });
     }
-    return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
-      appBar: AppBar(
-        title: Text(title),
-        centerTitle: true,
-        elevation: 0,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.email),
-            onPressed: _sendEmail,
-          ),
-          IconButton(
-            icon: Icon(Icons.check),
-            onPressed: () => _saveForm(false),
-          ),
-        ],
-      ),
+    return ScaffoldBody(
+      elevation: 0,
+      scaffoldBackground: Theme.of(context).primaryColor,
+      title: title,
+      centerTitle: true,
+      actions: [
+        IconButton(
+          icon: Icon(Icons.email),
+          onPressed: _sendEmail,
+        ),
+        IconButton(
+          icon: Icon(Icons.check),
+          onPressed: () => _saveForm(false),
+        ),
+      ],
       body: _isLoading
           ? Center(
               child: CircularProgressIndicator(

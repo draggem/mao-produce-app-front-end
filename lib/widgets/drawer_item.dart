@@ -16,7 +16,9 @@ class DrawerItem extends StatelessWidget {
         if (routeName == null) {
           return;
         } else {
-          Navigator.of(context).pushReplacementNamed(routeName);
+          //removes previous routes
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              routeName, ModalRoute.withName(routeName));
         }
       },
     );

@@ -48,6 +48,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
   var _isLoading = false;
 
 //Dispose focus nodes avoiding simultaneous focus
+  @override
   void dispose() {
     _emailFocusNode.dispose();
     _addressFocusNode.dispose();
@@ -108,7 +109,6 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
       setState(() {
         _isLoading = false;
       });
-      Navigator.of(context).pushNamed(CustomerScreen.routeName);
     } else {
       try {
         await Provider.of<CustomerHttps>(context, listen: false)
@@ -123,8 +123,11 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
       setState(() {
         _isLoading = false;
       });
-      Navigator.of(context).pushReplacementNamed(CustomerScreen.routeName);
     }
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      CustomerScreen.routeName,
+      ModalRoute.withName(CustomerScreen.routeName),
+    );
   }
 
   void _showErrorDialog(String message) {
