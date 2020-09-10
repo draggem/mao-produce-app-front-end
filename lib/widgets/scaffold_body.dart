@@ -10,23 +10,27 @@ class ScaffoldBody extends StatelessWidget {
   final Color scaffoldBackground;
   final Widget floatingActionButton;
   final bool titleOverflow;
+  final Widget appBarLeading;
 
-  ScaffoldBody(
-      {this.body,
-      this.actions,
-      this.title,
-      this.drawer,
-      this.centerTitle = false,
-      this.elevation,
-      this.scaffoldBackground,
-      this.floatingActionButton,
-      this.titleOverflow});
+  ScaffoldBody({
+    this.body,
+    this.actions,
+    this.title,
+    this.drawer,
+    this.centerTitle = false,
+    this.elevation,
+    this.scaffoldBackground,
+    this.floatingActionButton,
+    this.titleOverflow,
+    this.appBarLeading,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: scaffoldBackground,
       appBar: AppBar(
+        leading: appBarLeading,
         elevation: elevation,
         centerTitle: centerTitle,
         title: Text(
