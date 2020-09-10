@@ -9,17 +9,18 @@ class ScaffoldBody extends StatelessWidget {
   final double elevation;
   final Color scaffoldBackground;
   final Widget floatingActionButton;
+  final bool titleOverflow;
 
-  ScaffoldBody({
-    this.body,
-    this.actions,
-    this.title,
-    this.drawer,
-    this.centerTitle = false,
-    this.elevation,
-    this.scaffoldBackground,
-    this.floatingActionButton,
-  });
+  ScaffoldBody(
+      {this.body,
+      this.actions,
+      this.title,
+      this.drawer,
+      this.centerTitle = false,
+      this.elevation,
+      this.scaffoldBackground,
+      this.floatingActionButton,
+      this.titleOverflow});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +29,10 @@ class ScaffoldBody extends StatelessWidget {
       appBar: AppBar(
         elevation: elevation,
         centerTitle: centerTitle,
-        title: Text(title),
+        title: Text(
+          title,
+          overflow: titleOverflow == true ? TextOverflow.fade : null,
+        ),
         actions: actions,
       ),
       drawer: drawer,

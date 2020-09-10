@@ -5,6 +5,7 @@ import '../providers/order_https.dart';
 
 import '../widgets/order_all_tile.dart';
 import '../widgets/order_tile_customer.dart';
+import '../widgets/scaffold_body.dart';
 
 class SearchedOrderScreen extends StatefulWidget {
   //route name
@@ -25,14 +26,10 @@ class _SearchedOrderScreenState extends State<SearchedOrderScreen> {
 
     var searchedData;
 
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          'Results for ${query[0]}',
-          overflow: TextOverflow.fade,
-        ),
-      ),
+    return ScaffoldBody(
+      centerTitle: true,
+      title: 'Results for ${query[0]}',
+      titleOverflow: true,
       body: (() {
         switch (query[1]) {
           case 'customerOrder':
