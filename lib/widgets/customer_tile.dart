@@ -148,6 +148,9 @@ class _CustomerTileState extends State<CustomerTile> {
           title: Center(
             child: Text(
               widget.name,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              softWrap: false,
             ),
           ),
         ),

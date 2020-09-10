@@ -135,7 +135,12 @@ class _ProductTileState extends State<ProductTile> {
           ),
           trailing: Text('\$ ${widget.price.toStringAsFixed(2)}'),
           title: Center(
-            child: Text(widget.title),
+            child: Text(
+              widget.title,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              softWrap: false,
+            ),
           ),
         ),
       ),
