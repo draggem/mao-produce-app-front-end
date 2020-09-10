@@ -4,10 +4,10 @@ import 'package:provider/provider.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/product_tile.dart';
 import '../widgets/pick_product_tile.dart';
+import '../widgets/scaffold_body.dart';
 
 import '../providers/product_https.dart';
 import '../providers/recent_searches.dart';
-import '../providers/adding_product_order.dart';
 
 import '../screens/searched_item_screen.dart';
 import '../screens/edit_product_screen.dart';
@@ -49,19 +49,17 @@ class _ProductScreenState extends State<ProductScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(title),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              showSearch(context: context, delegate: DataSearch());
-            },
-          ),
-        ],
-      ),
+    return ScaffoldBody(
+      centerTitle: true,
+      title: title,
+      actions: [
+        IconButton(
+          icon: Icon(Icons.search),
+          onPressed: () {
+            showSearch(context: context, delegate: DataSearch());
+          },
+        ),
+      ],
       drawer: ProductScreen.isProductAdding == true ? null : AppDrawer(),
       body: FutureBuilder(
         future: _refreshProducts(context),

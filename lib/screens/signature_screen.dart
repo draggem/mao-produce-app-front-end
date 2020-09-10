@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../widgets/signaturePad.dart';
+import '../widgets/scaffold_body.dart';
 
 class SignatureScreen extends StatefulWidget {
   static const routeName = '/signature';
@@ -38,8 +39,8 @@ class _SignatureScreenState extends State<SignatureScreen> {
     // SystemChrome.setEnabledSystemUIOverlays([]);
 
     //return the SignaturePad widget
-    return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
+    return ScaffoldBody(
+      scaffoldBackground: Theme.of(context).primaryColor,
       body: new SignaturePad(),
     );
   }

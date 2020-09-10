@@ -7,6 +7,7 @@ import '../providers/product_https.dart';
 import '../widgets/customer_tile.dart';
 import '../widgets/product_tile.dart';
 import '../widgets/pick_product_tile.dart';
+import '../widgets/scaffold_body.dart';
 
 class SearchedItemScreen extends StatefulWidget {
   //route name
@@ -28,14 +29,10 @@ class _SearchedItemScreenState extends State<SearchedItemScreen> {
 
     var searchedData;
 
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          'Results for ${query[0]}',
-          overflow: TextOverflow.fade,
-        ),
-      ),
+    return ScaffoldBody(
+      centerTitle: true,
+      title: 'Results for ${query[0]}',
+      titleOverflow: true,
       body: (() {
         switch (query[1]) {
           case 'customer':
