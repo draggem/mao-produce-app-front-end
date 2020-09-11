@@ -165,6 +165,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                   itemBuilder: (_, i) => OrderTileCustomer(
                                     id: orderData.items[i].id,
                                     dateTime: orderData.items[i].orderDate,
+                                    custId: orderData.items[i].custId,
                                     isOpen: orderData.items[i].isOpen,
                                     totalPrice: orderData.items[i].totalPrice,
                                     products: orderData.items[i].products

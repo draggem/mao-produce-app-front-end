@@ -96,6 +96,7 @@ class OrderHttps with ChangeNotifier {
           loadedOrders.add(
             OrderAllModel(
                 id: extractedData[i]['id'],
+                custId: extractedData[i]['customerid'],
                 orderDate: DateTime.parse(extractedData[i]['datetime']),
                 totalPrice: double.parse(extractedData[i]['totalprice']),
                 isOpen: (extractedData[i]['isopen']),

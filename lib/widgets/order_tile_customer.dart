@@ -3,22 +3,33 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
-
-import '../models/order_product_model.dart';
+import 'package:mao_produce/providers/adding_product_order.dart';
+import 'package:provider/provider.dart';
+import '../providers/adding_product_order.dart';
+import '../screens/edit_order_screen.dart';
+import 'package:vibration/vibration.dart';
+import '../providers/order_https.dart';
+import '../screens/order_screen.dart';
 
 class OrderTileCustomer extends StatefulWidget {
   final String id;
+  final String custId;
+  final String name;
   final double totalPrice;
   final DateTime dateTime;
   final bool isOpen;
   final List<dynamic> products;
+  final Map<String, String> signature;
 
   OrderTileCustomer({
     this.id,
+    this.custId,
+    this.name,
     this.totalPrice,
     this.dateTime,
     this.isOpen,
     this.products,
+    this.signature,
   });
 
   @override
@@ -29,6 +40,102 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
   var _expanded = false;
   @override
   Widget build(BuildContext context) {
+    final scaffold = Scaffold.of(context);
+    print(widget.id);
+
+    //delete confirm dialogue
+    void _confirmDelete() {
+      Vibration.vibrate(duration: 500);
+      var _isLoading = false;
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (ctx) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                elevation: 0,
+                title: _isLoading
+                    ? Text('')
+                    : Text(
+                        'Warning',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                backgroundColor: _isLoading ? Colors.transparent : Colors.red,
+                content: _isLoading
+                    ? Center(
+                        child: SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 9,
+                          ),
+                        ),
+                      )
+                    : Text('Are you sure you want to remove this Order?',
+                        style: TextStyle(color: Colors.white)),
+                actions: <Widget>[
+                  FlatButton(
+                      child: _isLoading
+                          ? Text('')
+                          : Text(
+                              'Delete',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                      onPressed: () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        try {
+                          print(widget.id);
+                          print(widget.custId);
+                          await Provider.of<OrderHttps>(context, listen: false)
+                              .deleteOrder(widget.id, widget.custId);
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          Navigator.of(context).pop();
+                        } catch (e) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pushReplacementNamed(
+                              OrderScreen.routeName,
+                              arguments: [widget.custId, widget.name, true]);
+
+                          scaffold.showSnackBar(SnackBar(
+                            content: Text(
+                              'Deleting Failed!',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.red,
+                          ));
+                        }
+                      }),
+                  FlatButton(
+                    child: _isLoading
+                        ? Text('')
+                        : Text(
+                            'Cancel',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+    }
+
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
       actionExtentRatio: 0.25,
@@ -121,13 +228,26 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
           caption: 'Edit',
           color: Colors.orange,
           icon: Icons.edit,
-          onTap: () {},
+          onTap: () {
+            //initialise provider
+            var provider =
+                Provider.of<AddingProductOrder>(context, listen: false);
+            //add products for selected order
+            provider.clear();
+            widget.products.forEach((element) => provider.addProduct(element));
+            provider.addSign(widget.signature['signature']);
+            List<String> arg = [widget.id, 'edit'];
+            Navigator.of(context)
+                .pushNamed(EditOrderScreen.routeName, arguments: arg);
+          },
         ),
         IconSlideAction(
             caption: 'Delete',
             color: Colors.red,
             icon: Icons.delete,
-            onTap: () {}),
+            onTap: () {
+              _confirmDelete();
+            }),
       ],
     );
   }
