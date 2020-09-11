@@ -106,7 +106,11 @@ class _ProductTileState extends State<ProductTile> {
         });
       },
       child: ListTile(
-        title: Text(widget.title),
+        title: Text(
+          widget.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         leading: Text('${widget.quantity.toStringAsFixed(0)}'),
         trailing: Text(
           widget.price.toStringAsFixed(2),

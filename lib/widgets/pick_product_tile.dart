@@ -68,7 +68,11 @@ class _PickProductTileState extends State<PickProductTile> {
         ),
         title: Padding(
           padding: EdgeInsets.only(top: 5),
-          child: Text(widget.title),
+          child: Text(
+            widget.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         subtitle: Text('\$${widget.price.toStringAsFixed(2)}'),
       ),
