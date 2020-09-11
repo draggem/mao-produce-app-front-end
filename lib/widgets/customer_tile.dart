@@ -160,7 +160,7 @@ class _CustomerTileState extends State<CustomerTile> {
                 icon: Icons.assignment,
                 onTap: () {
                   Navigator.of(context).pushNamed(OrderScreen.routeName,
-                      arguments: [widget.id, widget.name]);
+                      arguments: [widget.id, widget.name, true]);
                 },
               )
             : Container(),

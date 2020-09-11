@@ -44,7 +44,7 @@ class OrderHttps with ChangeNotifier {
         String orderCustName = order.custName == null ? query : order.custName;
         String orderDate =
             DateFormat('dd/MM/yyyy').format(order.orderDate).toString();
-        String totalPrice = order.totalPrice.toString();
+        String totalPrice = order.totalPrice.toStringAsFixed(2);
         if (query.contains(orderId) &&
             query.contains(orderCustName) &&
             query.contains(orderDate) &&
