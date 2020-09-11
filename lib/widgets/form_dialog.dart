@@ -105,7 +105,14 @@ class _FormDialogState extends State<FormDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Column(children: <Widget>[
-                    Text(widget.title, overflow: TextOverflow.fade),
+                    Container(
+                        width: 180,
+                        child: Text(
+                          widget.title,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(color: Colors.white),
+                        )),
                     provider.isProductAdded(widget.id) == true
                         ? Text(
                             'this product has already been added',
