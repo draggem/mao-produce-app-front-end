@@ -42,6 +42,8 @@ class _SignatureScreenState extends State<SignatureScreen> {
     return ScaffoldBody(
       scaffoldBackground: Theme.of(context).primaryColor,
       body: new SignaturePad(),
+      title: '',
+      enableAppBar: false,
     );
   }
 }
