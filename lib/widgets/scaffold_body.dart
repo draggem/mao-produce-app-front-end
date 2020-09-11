@@ -11,6 +11,7 @@ class ScaffoldBody extends StatelessWidget {
   final Widget floatingActionButton;
   final bool titleOverflow;
   final Widget appBarLeading;
+  final enableAppBar;
 
   ScaffoldBody({
     this.body,
@@ -23,22 +24,25 @@ class ScaffoldBody extends StatelessWidget {
     this.floatingActionButton,
     this.titleOverflow,
     this.appBarLeading,
+    this.enableAppBar = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: scaffoldBackground,
-      appBar: AppBar(
-        leading: appBarLeading,
-        elevation: elevation,
-        centerTitle: centerTitle,
-        title: Text(
-          title,
-          overflow: titleOverflow == true ? TextOverflow.fade : null,
-        ),
-        actions: actions,
-      ),
+      appBar: enableAppBar == true
+          ? AppBar(
+              leading: appBarLeading,
+              elevation: elevation,
+              centerTitle: centerTitle,
+              title: Text(
+                title,
+                overflow: titleOverflow == true ? TextOverflow.fade : null,
+              ),
+              actions: actions,
+            )
+          : null,
       drawer: drawer,
       body: WillPopScope(
         onWillPop: () async {

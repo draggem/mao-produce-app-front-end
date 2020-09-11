@@ -194,6 +194,7 @@ class OrderHttps with ChangeNotifier {
     var response;
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Send/${order.custId}';
+    bool orderStatus = signature == null ? order.isOpen : false;
 
     //check if it is editing
     if (editing || order.id != null) {
@@ -215,7 +216,7 @@ class OrderHttps with ChangeNotifier {
             'id': order.id,
             'datetime': order.orderDate.toString(),
             'totalprice': order.totalPrice,
-            'isopen': order.isOpen,
+            'isopen': orderStatus.toString(),
             'products': order.products
                 .map((item) => {
                       'id': item.id,
@@ -245,7 +246,7 @@ class OrderHttps with ChangeNotifier {
         id: orderId,
         custId: order.custId,
         custName: order.custName,
-        isOpen: order.isOpen,
+        isOpen: orderStatus,
         orderDate: DateTime.now(),
         products: order.products,
         totalPrice: order.totalPrice,
@@ -259,6 +260,7 @@ class OrderHttps with ChangeNotifier {
   //update order function
   Future<void> updateOrder(
       OrderAllModel order, var signature, String signee) async {
+    bool orderStatus = signature == null ? order.isOpen : false;
     try {
       final orderIndex = _items.indexWhere((prod) => prod.id == order.id);
 
@@ -273,7 +275,7 @@ class OrderHttps with ChangeNotifier {
               'id': order.id,
               'datetime': order.orderDate.toString(),
               'totalprice': order.totalPrice,
-              'isopen': order.isOpen,
+              'isopen': orderStatus.toString(),
               'products': order.products
                   .map((item) => {
                         'id': item.id,
@@ -303,6 +305,8 @@ class OrderHttps with ChangeNotifier {
       OrderAllModel order, var signature, String signee) async {
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Orders/${order.custId}';
+    //check if it has signature. If it does, make it close else open
+    bool orderStatus = signature == null ? order.isOpen : false;
 
     try {
       final response = await http.put(
@@ -315,7 +319,7 @@ class OrderHttps with ChangeNotifier {
             'id': order.id.toString(),
             'orderData': DateTime.now().toString(),
             'totalprice': order.totalPrice.toString(),
-            'isopen': order.isOpen.toString(),
+            'isopen': orderStatus.toString(),
             'products': order.products
                 .map(
                   (product) => {
@@ -343,7 +347,7 @@ class OrderHttps with ChangeNotifier {
         id: orderId,
         custId: order.custId,
         custName: order.custName,
-        isOpen: order.isOpen,
+        isOpen: orderStatus,
         orderDate: DateTime.now(),
         products: order.products,
         totalPrice: order.totalPrice,
