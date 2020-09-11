@@ -27,8 +27,8 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> {
   String custId = " ";
-
-  static String custName = " ";
+  String custName = " ";
+  static bool isFromCustomers = false;
 
   var appBarTitle = 'Orders';
 
@@ -40,11 +40,12 @@ class _OrderScreenState extends State<OrderScreen> {
   void didChangeDependencies() {
     if (ModalRoute.of(context).settings.arguments != null) {
       final arg = ModalRoute.of(context).settings.arguments as List;
-      if (arg.length == 2) {
+      if (arg.length == 3) {
         setState(() {
           custId = arg[0];
           appBarTitle = '${arg[1]} Orders';
           custName = '${arg[1]}';
+          isFromCustomers = arg[2];
         });
       }
     }
@@ -276,7 +277,7 @@ class DataSearch extends SearchDelegate<String> {
               onTap: () {
                 final searchedData = [
                   suggestionList[index],
-                  _OrderScreenState.custName == " "
+                  _OrderScreenState.isFromCustomers == true
                       ? 'customerOrder'
                       : 'allOrder'
                 ];
@@ -339,7 +340,9 @@ class DataSearch extends SearchDelegate<String> {
             onTap: () {
               final searchedData = [
                 suggestionList[index],
-                _OrderScreenState.custName == " " ? 'customerOrder' : 'allOrder'
+                _OrderScreenState.isFromCustomers == true
+                    ? 'customerOrder'
+                    : 'allOrder'
               ];
               Navigator.of(context).pushNamed(SearchedOrderScreen.routeName,
                   arguments: searchedData);
