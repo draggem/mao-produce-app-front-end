@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
@@ -41,8 +40,6 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
   @override
   Widget build(BuildContext context) {
     final scaffold = Scaffold.of(context);
-    print(widget.id);
-
     //delete confirm dialogue
     void _confirmDelete() {
       Vibration.vibrate(duration: 500);
@@ -89,24 +86,19 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
                           _isLoading = true;
                         });
                         try {
-                          print(widget.id);
-                          print(widget.custId);
                           await Provider.of<OrderHttps>(context, listen: false)
                               .deleteOrder(widget.id, widget.custId);
                           setState(() {
                             _isLoading = false;
                           });
                           Navigator.of(context).pop();
+                          Navigator.of(context).pushReplacementNamed(
+                              OrderScreen.routeName,
+                              arguments: [widget.custId, widget.name, true]);
                         } catch (e) {
                           setState(() {
                             _isLoading = false;
                           });
-
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pushReplacementNamed(
-                              OrderScreen.routeName,
-                              arguments: [widget.custId, widget.name, true]);
-
                           scaffold.showSnackBar(SnackBar(
                             content: Text(
                               'Deleting Failed!',
@@ -157,10 +149,9 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    RichText(
+                    Text(
+                      '\$${widget.totalPrice.toStringAsFixed(2)}',
                       overflow: TextOverflow.fade,
-                      text: TextSpan(
-                          text: '\$${widget.totalPrice.toStringAsFixed(2)}'),
                     ),
                     IconButton(
                       icon: Icon(

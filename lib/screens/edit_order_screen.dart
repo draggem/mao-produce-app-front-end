@@ -103,7 +103,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         isEditing = true;
 
         //initialise title for edit
-        title = 'Edit the Order of ${selectedOrder.custName}';
+        title = '${selectedOrder.custName}';
 
         //initialise order date if order is under edit
         _editedOrder.orderDate = selectedOrder.orderDate;
