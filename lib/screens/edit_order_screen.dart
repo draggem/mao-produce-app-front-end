@@ -26,7 +26,7 @@ class EditOrderScreen extends StatefulWidget {
 
 class _EditOrderScreenState extends State<EditOrderScreen> {
   bool isEditing;
-
+  bool perCust = false;
   String title;
 
   bool _orderStatus = true;
@@ -81,6 +81,9 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         //initialise form as adding product
         isEditing = false;
       } else {
+        order.asMap().containsKey(2) && order[2] == "true"
+            ? perCust = true
+            : perCust = false;
         var selectedOrder =
             Provider.of<OrderHttps>(context, listen: false).findById(order[0]);
         _initValues = {
@@ -103,7 +106,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         isEditing = true;
 
         //initialise title for edit
-        title = 'Edit the Order of ${selectedOrder.custName}';
+        title = '${selectedOrder.custName}';
 
         //initialise order date if order is under edit
         _editedOrder.orderDate = selectedOrder.orderDate;
@@ -179,10 +182,14 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
     setState(() {
       _isLoading = false;
     });
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      OrderScreen.routeName,
-      ModalRoute.withName(OrderScreen.routeName),
-    );
+    //added notation whether its from cust->order screen or just order screen.
+    !perCust
+        ? Navigator.of(context).pushNamedAndRemoveUntil(
+            OrderScreen.routeName,
+            ModalRoute.withName(OrderScreen.routeName),
+          )
+        : Navigator.of(context).pushNamed(OrderScreen.routeName,
+            arguments: [_editedOrder.custId, _editedOrder.custName, true]);
   }
 
   void _showErrorDialog(String message) {

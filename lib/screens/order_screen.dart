@@ -43,8 +43,8 @@ class _OrderScreenState extends State<OrderScreen> {
       if (arg.length == 3) {
         setState(() {
           custId = arg[0];
-          appBarTitle = '${arg[1]} Orders';
           custName = '${arg[1]}';
+          appBarTitle = '$custName\'s Orders';
           isFromCustomers = arg[2];
         });
       }
@@ -163,10 +163,13 @@ class _OrderScreenState extends State<OrderScreen> {
                               : ListView.builder(
                                   itemCount: orderData.items.length,
                                   itemBuilder: (_, i) => OrderTileCustomer(
+                                    custId: orderData.items[i].custId,
+                                    custName: orderData.items[i].custName,
                                     id: orderData.items[i].id,
                                     dateTime: orderData.items[i].orderDate,
                                     isOpen: orderData.items[i].isOpen,
                                     totalPrice: orderData.items[i].totalPrice,
+                                    signature: orderData.items[i].signature,
                                     products: orderData.items[i].products
                                         .map(
                                           (prod) => OrderProductModel(
