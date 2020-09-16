@@ -163,10 +163,10 @@ class _OrderScreenState extends State<OrderScreen> {
                               : ListView.builder(
                                   itemCount: orderData.items.length,
                                   itemBuilder: (_, i) => OrderTileCustomer(
+                                    custId: orderData.items[i].custId,
+                                    custName: orderData.items[i].custName,
                                     id: orderData.items[i].id,
                                     dateTime: orderData.items[i].orderDate,
-                                    name: this.custName,
-                                    custId: orderData.items[i].custId,
                                     isOpen: orderData.items[i].isOpen,
                                     totalPrice: orderData.items[i].totalPrice,
                                     signature: orderData.items[i].signature,

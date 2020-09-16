@@ -13,7 +13,7 @@ import '../screens/order_screen.dart';
 class OrderTileCustomer extends StatefulWidget {
   final String id;
   final String custId;
-  final String name;
+  final String custName;
   final double totalPrice;
   final DateTime dateTime;
   final bool isOpen;
@@ -23,7 +23,7 @@ class OrderTileCustomer extends StatefulWidget {
   OrderTileCustomer({
     this.id,
     this.custId,
-    this.name,
+    this.custName,
     this.totalPrice,
     this.dateTime,
     this.isOpen,
@@ -94,7 +94,11 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
                           Navigator.of(context).pop();
                           Navigator.of(context).pushReplacementNamed(
                               OrderScreen.routeName,
-                              arguments: [widget.custId, widget.name, true]);
+                              arguments: [
+                                widget.custId,
+                                widget.custName,
+                                true
+                              ]);
                         } catch (e) {
                           setState(() {
                             _isLoading = false;
@@ -227,7 +231,7 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
             provider.clear();
             widget.products.forEach((element) => provider.addProduct(element));
             provider.addSign(widget.signature['signature']);
-            List<String> arg = [widget.id, 'edit'];
+            List<String> arg = [widget.id, 'edit', 'true'];
             Navigator.of(context)
                 .pushNamed(EditOrderScreen.routeName, arguments: arg);
           },

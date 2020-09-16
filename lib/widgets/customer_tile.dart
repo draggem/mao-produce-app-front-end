@@ -9,7 +9,6 @@ import '../screens/order_screen.dart';
 import '../screens/edit_order_screen.dart';
 
 import '../providers/customer_https.dart';
-import '../providers/adding_product_order.dart';
 
 class CustomerTile extends StatefulWidget {
   final String id;
