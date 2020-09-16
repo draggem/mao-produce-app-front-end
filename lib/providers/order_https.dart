@@ -127,6 +127,7 @@ class OrderHttps with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print(e.toString());
+      throw "We could not connect you to the server. Please check your internet connection.";
     }
   }
 
@@ -185,6 +186,7 @@ class OrderHttps with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print(e.toString());
+      throw "There was something wrong. Please check your internet connection";
     }
   }
 
@@ -235,7 +237,7 @@ class OrderHttps with ChangeNotifier {
             }
           }));
     } catch (e) {
-      throw e;
+      throw "There was something wrong. Please check your internet connection";
     }
     print(response.statusCode);
     if (editing) {
@@ -298,7 +300,7 @@ class OrderHttps with ChangeNotifier {
         print('Order list is empty');
       }
     } catch (e) {
-      throw (e);
+      throw "There was something wrong. Please check your internet connection";
     }
   }
 
@@ -357,7 +359,7 @@ class OrderHttps with ChangeNotifier {
       _items.add(newOrder);
       notifyListeners();
     } catch (error) {
-      throw error;
+      throw "There was something wrong. Please check your internet connection";
     }
   }
 

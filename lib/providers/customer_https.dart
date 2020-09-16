@@ -134,7 +134,7 @@ class CustomerHttps with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print(e);
-      throw (e);
+      throw ("We could not connect you to the server. Please check your internet connection.");
     }
   }
 
@@ -171,7 +171,7 @@ class CustomerHttps with ChangeNotifier {
       _items.add(newCustomer);
       notifyListeners();
     } catch (error) {
-      throw error;
+      throw "There was something wrong. Please check your internet connection";
     }
   }
 
@@ -218,7 +218,7 @@ class CustomerHttps with ChangeNotifier {
       }
     } catch (e) {
       print(e);
-      throw (e);
+      throw "There was something wrong. Please check your internet connection";
     }
   }
 }
