@@ -2,11 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/customer_model.dart';
 import '../models/http_exception.dart';
+import '../models/system_prefs.dart';
 
 class CustomerHttps with ChangeNotifier {
+  final userToken = SystemPrefs.getUserData();
   List<CustomerModel> _items = [
     CustomerModel(
         id: 'p1',
@@ -103,9 +106,13 @@ class CustomerHttps with ChangeNotifier {
   Future<void> fetchAndSetCustomers() async {
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Customers';
-    try {
-      final response = await http.get(url);
 
+    final response = await http.get(url, headers: {
+      'Authorization': userToken,
+      'Content-Type': 'application/json'
+    });
+    print(response.body);
+    try {
       final List<CustomerModel> loadedCustomers = [];
       final extractedData = json.decode(response.body);
 
@@ -144,7 +151,10 @@ class CustomerHttps with ChangeNotifier {
     try {
       final response = await http.put(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': userToken,
+          'Content-Type': 'application/json'
+        },
         body: json.encode(
           {
             'name': customer.name,
@@ -181,7 +191,10 @@ class CustomerHttps with ChangeNotifier {
     var existingCustomer = _items[existingCustomerIndex];
     notifyListeners();
 
-    final response = await http.delete(url);
+    final response = await http.delete(url, headers: {
+      'Authorization': userToken,
+      'Content-Type': 'application/json'
+    });
 
     if (response.statusCode >= 400) {
       _items.insert(existingCustomerIndex, existingCustomer);
@@ -201,7 +214,10 @@ class CustomerHttps with ChangeNotifier {
             'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Customers/$id';
 
         final response = await http.patch(url,
-            headers: {"Content-Type": "application/json"},
+            headers: {
+              'Authorization': userToken,
+              'Content-Type': 'application/json'
+            },
             body: json.encode({
               'id': newCustomer.id,
               'name': newCustomer.name,

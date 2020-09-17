@@ -7,8 +7,10 @@ import 'package:intl/intl.dart';
 import '../models/order_product_model.dart';
 import '../models/order_all_model.dart';
 import '../models/http_exception.dart';
+import '../models/system_prefs.dart';
 
 class OrderHttps with ChangeNotifier {
+  final userToken = SystemPrefs.getUserData();
   List<OrderAllModel> _items = [
     // OrderModel(
     //   id: 'p1',
@@ -73,7 +75,10 @@ class OrderHttps with ChangeNotifier {
 
     try {
       _items = [];
-      final response = await http.get(url);
+      final response = await http.get(url, headers: {
+        'Authorization': userToken,
+        'Content-Type': 'application/json'
+      });
 
       final List<OrderAllModel> loadedOrders = [];
       final extractedData = json.decode(response.body);
@@ -135,7 +140,10 @@ class OrderHttps with ChangeNotifier {
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Orders?isOpen=$isOpen';
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(url, headers: {
+        'Authorization': userToken,
+        'Content-Type': 'application/json'
+      });
       final List<OrderAllModel> loadedOrders = [];
       final extractedData = json.decode(response.body);
 
@@ -207,7 +215,10 @@ class OrderHttps with ChangeNotifier {
 
     try {
       response = await http.post(url,
-          headers: {'Content-Type': 'applications/json'},
+          headers: {
+            'Authorization': userToken,
+            'Content-Type': 'application/json'
+          },
           body: json.encode({
             'customerid': order.custId,
             'customername': order.custName,
@@ -265,7 +276,10 @@ class OrderHttps with ChangeNotifier {
         var url =
             'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Orders/${order.custId}?orderId=${order.id}';
         final response = await http.patch(url,
-            headers: {"Content-Type": "applications/json"},
+            headers: {
+              'Authorization': userToken,
+              'Content-Type': 'application/json'
+            },
             body: json.encode({
               'customerid': order.custId,
               'customername': order.custName,
@@ -306,7 +320,10 @@ class OrderHttps with ChangeNotifier {
     try {
       final response = await http.put(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': userToken,
+          'Content-Type': 'application/json'
+        },
         body: json.encode(
           {
             'customerid': order.custId,
@@ -362,7 +379,10 @@ class OrderHttps with ChangeNotifier {
     var existingOrder = _items[existingOrderIndex];
     notifyListeners();
 
-    final response = await http.delete(url);
+    final response = await http.delete(url, headers: {
+      'Authorization': userToken,
+      'Content-Type': 'application/json'
+    });
     final msg = response.body;
     if (response.statusCode >= 400) {
       _items.insert(existingOrderIndex, existingOrder);
