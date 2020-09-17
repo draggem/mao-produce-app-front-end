@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 // import '../providers/auth.dart';
 import '../providers/user_service.dart';
-
 //import '../models/http_exception.dart';
 
 enum AuthMode {
@@ -146,37 +145,55 @@ class _AuthCardState extends State<AuthCard>
             'An email has been sent to verify your account', success);
       }
     } on CognitoClientException catch (error) {
-      var errorMessage = 'Authentication Failed';
-      print(error.toString());
-
+      var errorMessage =
+          'An unamed error occured. Take a screenshot and contact the app admin.';
       success = false;
 
       //If statements for every error message backend gives
       //This is the front end receiver for the http_exceptions to display in front end
+      //SIGNUP Exceptions
       if (error.code == 'UsernameExistsException') {
         errorMessage = 'This email has already been taken';
-      } else if (error.toString().contains('INVALID_EMAIL')) {
-        errorMessage = 'This is not a valid email address';
-      } else if (error.toString().contains('WEAK_PASSWORD')) {
-        errorMessage = 'This password is too weak.';
-      } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
-        errorMessage = 'Could not find a user with that email.';
-      } else if (error.toString().contains('INVALID_PASSWORD')) {
-        errorMessage = 'Invalid password.';
+      } else if (error.code == 'ResourceNotFoundException') {
+        errorMessage = 'Cannot find the requested resource.';
+      } else if (error.code == 'NotAuthorizedException') {
+        errorMessage = 'Not Authorized. Password or email was wrong.';
+      } else if (error.code == 'InvalidPasswordException') {
+        errorMessage =
+            'Invalid Password. Make sure your password has an upper-case and a number.';
+      } else if (error.code == 'InternalErrorException') {
+        errorMessage = 'Internal Server Error. Please contact the app admin.';
+      } else if (error.code == 'CodeDeliveryFailureException') {
+        errorMessage =
+            'There was an error sending verification code. Please try again later.';
+      } else if (error.code == 'InvalidEmailRoleAccessPolicyException') {
+        errorMessage = 'Invalid Email. Please use a valid one.';
+      } else if (error.code == 'TooManyRequestsExceptionelse ') {
+        errorMessage = 'Too many request. Please try again later.';
       }
-
-      print(error.toString());
+      //SIGN IN Exceptions
+      else if (error.code == 'UserNotFoundException') {
+        errorMessage = 'User does not exist. Please try again.';
+      } else if (error.code == 'UserNotConfirmedException') {
+        errorMessage =
+            'Unable to login. Please verify your account first with the email we sent to you.';
+      } else if (error.code == 'PasswordResetRequiredException') {
+        errorMessage = 'You need to reset your password before you can login.';
+      } else if (error.code == 'UserNotFoundException') {
+        errorMessage = 'User does not exist. Please try again.';
+      } else if (error.code == 'UserNotFoundException') {
+        errorMessage = 'User does not exist. Please try again.';
+      } else if (error.code == 'UserNotFoundException') {
+        errorMessage = 'User does not exist. Please try again.';
+      }
 
       _showErrorDialog(errorMessage, success);
     } catch (error) {
       //error from phone
       const errorMessage =
           'Could not authenticate you. Check your internet conncetion';
-
       success = false;
-
       _showErrorDialog(errorMessage, success);
-      print(error.toString());
     }
   }
 
