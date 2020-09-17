@@ -2,13 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/products_model.dart';
 import '../models/http_exception.dart';
-import '../models/system_prefs.dart';
 
 class ProductHttps with ChangeNotifier {
-  final userToken = SystemPrefs.getUserData();
   List<ProductsModel> _items = [
     // ProductsModel(
     //     id: 'gago',
@@ -50,6 +49,9 @@ class ProductHttps with ChangeNotifier {
   Future<void> fetchAndSetProducts() async {
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Products';
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.decode(prefs.getString('userData'));
+    var userToken = userData['token'];
 
     try {
       final response = await http.get(url, headers: {
@@ -116,6 +118,9 @@ class ProductHttps with ChangeNotifier {
   Future<void> addProduct(ProductsModel product) async {
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Products';
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.decode(prefs.getString('userData'));
+    var userToken = userData['token'];
 
     try {
       final response = await http.put(
@@ -152,6 +157,9 @@ class ProductHttps with ChangeNotifier {
   Future<void> deleteProduct(String id) async {
     final url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Products/$id';
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.decode(prefs.getString('userData'));
+    var userToken = userData['token'];
     final existingProductIndex =
         _items.indexWhere((product) => product.id == id);
     var existingProduct = _items[existingProductIndex];
@@ -178,6 +186,9 @@ class ProductHttps with ChangeNotifier {
       if (productIndex >= 0) {
         final url =
             'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Products/$id';
+        final prefs = await SharedPreferences.getInstance();
+        final userData = json.decode(prefs.getString('userData'));
+        var userToken = userData['token'];
 
         final response = await http.patch(url,
             headers: {
