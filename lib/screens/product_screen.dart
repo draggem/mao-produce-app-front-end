@@ -31,7 +31,6 @@ class _ProductScreenState extends State<ProductScreen> {
           .fetchAndSetProducts();
     } catch (e) {
       _showErrorDialog(context, e);
-      print(e);
     }
   }
 

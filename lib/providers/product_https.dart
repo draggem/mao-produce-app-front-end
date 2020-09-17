@@ -176,11 +176,9 @@ class ProductHttps with ChangeNotifier {
               'Price': newProduct.price.toStringAsFixed(2),
               'ImageUrl': newProduct.url,
             }));
-        print(json.decode(response.body));
         _items[productIndex] = newProduct;
       }
     } catch (e) {
-      print(e);
       throw "We could not connect you to the server. Please check your internet connection.";
     }
   }

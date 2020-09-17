@@ -122,7 +122,6 @@ class UserService with ChangeNotifier {
       //store the data inside the phone
       prefs.setString('userData', userData);
 
-      print(prefs.getString('userData'));
       //This is storage memory number 2
       final attributes = await _cognitoUser.getUserAttributes();
       final user = User.fromUserAttributes(attributes);
@@ -164,16 +163,12 @@ class UserService with ChangeNotifier {
   /// Sign upuser
   Future<User> signUp(String email, String password) async {
     try {
-      print('sign up method');
-
       CognitoUserPoolData data;
       data = await _userPool.signUp(email, password);
 
       final user = User();
       user.email = email;
       user.confirmed = data.userConfirmed;
-
-      print(data.runtimeType.toString());
 
       return user;
     } catch (e) {
@@ -198,11 +193,9 @@ class UserService with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       prefs.clear();
       if (_cognitoUser != null) {
-        print("oten");
         return _cognitoUser.signOut();
       }
     } catch (e) {
-      print("you have a problem at signout func: ${e.toString()}");
       throw e.toString();
     }
   }

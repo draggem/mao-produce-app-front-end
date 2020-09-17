@@ -154,8 +154,6 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
     });
 
     _form.currentState.save();
-
-    print(_editedOrder.id);
     //add product inside
     _editedOrder.products = productList;
     //add total price inside
@@ -310,7 +308,6 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(_initValues['id']);
     bool isSign = false;
     var provider = Provider.of<AddingProductOrder>(context);
 
