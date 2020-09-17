@@ -166,6 +166,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       ProductScreen.routeName,
       ModalRoute.withName(ProductScreen.routeName),
     );
+    Navigator.of(context).pop();
   }
 
   @override
