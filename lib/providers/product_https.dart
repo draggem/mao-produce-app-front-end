@@ -5,8 +5,10 @@ import 'package:http/http.dart' as http;
 
 import '../models/products_model.dart';
 import '../models/http_exception.dart';
+import '../models/system_prefs.dart';
 
 class ProductHttps with ChangeNotifier {
+  final userToken = SystemPrefs.getUserData();
   List<ProductsModel> _items = [
     // ProductsModel(
     //     id: 'gago',
@@ -50,7 +52,10 @@ class ProductHttps with ChangeNotifier {
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Products';
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(url, headers: {
+        'Authorization': userToken,
+        'Content-Type': 'application/json'
+      });
 
       final List<ProductsModel> loadedProducts = [];
       final extractedData = json.decode(response.body);
@@ -115,7 +120,10 @@ class ProductHttps with ChangeNotifier {
     try {
       final response = await http.put(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': userToken,
+          'Content-Type': 'application/json'
+        },
         body: json.encode(
           {
             'Title': product.title,
@@ -149,7 +157,10 @@ class ProductHttps with ChangeNotifier {
     var existingProduct = _items[existingProductIndex];
     notifyListeners();
 
-    final response = await http.delete(url);
+    final response = await http.delete(url, headers: {
+      'Authorization': userToken,
+      'Content-Type': 'application/json'
+    });
 
     if (response.statusCode >= 400) {
       _items.insert(existingProductIndex, existingProduct);
@@ -169,7 +180,10 @@ class ProductHttps with ChangeNotifier {
             'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Products/$id';
 
         final response = await http.patch(url,
-            headers: {"Content-Type": "application/json"},
+            headers: {
+              'Authorization': userToken,
+              'Content-Type': 'application/json'
+            },
             body: json.encode({
               'Id': newProduct.id,
               'Title': newProduct.title,

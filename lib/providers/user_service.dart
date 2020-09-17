@@ -12,7 +12,7 @@ import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 //import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const _identityPoolId = 'ap-southeast-2:546acadb-99c7-485d-b8d4-952d7f1b875c';
+const _identityPoolId = 'ap-southeast-2:1f9ad89c-b5b6-4f82-9178-21e86f630f92';
 
 class UserService with ChangeNotifier {
   //Variables required before logging in.
@@ -91,7 +91,7 @@ class UserService with ChangeNotifier {
     bool isConfirmed;
     try {
       _session = await _cognitoUser.authenticateUser(authDetails);
-      _token = _session.getAccessToken().getJwtToken();
+      _token = _session.getIdToken().getJwtToken();
       _userId = _cognitoUser.getUsername();
       int tokenExpiry = _session.getAccessToken().getExpiration();
       //Convert expiry to DateTime

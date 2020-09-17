@@ -145,8 +145,7 @@ class _AuthCardState extends State<AuthCard>
             'An email has been sent to verify your account', success);
       }
     } on CognitoClientException catch (error) {
-      var errorMessage =
-          'An unamed error occured. Take a screenshot and contact the app admin.';
+      var errorMessage = error.toString();
       success = false;
 
       //If statements for every error message backend gives
