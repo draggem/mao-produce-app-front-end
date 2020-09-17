@@ -128,6 +128,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
       CustomerScreen.routeName,
       ModalRoute.withName(CustomerScreen.routeName),
     );
+    Navigator.of(context).pop();
   }
 
   void _showErrorDialog(String message) {
