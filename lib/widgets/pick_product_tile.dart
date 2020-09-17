@@ -37,7 +37,6 @@ class _PickProductTileState extends State<PickProductTile> {
     if (value == null) {
       return false;
     }
-    print(double.parse(value, (e) => null) != null);
     return double.parse(value, (e) => null) != null;
   }
 

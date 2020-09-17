@@ -6,10 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/customer_model.dart';
 import '../models/http_exception.dart';
-import '../models/system_prefs.dart';
 
 class CustomerHttps with ChangeNotifier {
-  final userToken = SystemPrefs.getUserData();
   List<CustomerModel> _items = [
     CustomerModel(
         id: 'p1',
@@ -106,12 +104,13 @@ class CustomerHttps with ChangeNotifier {
   Future<void> fetchAndSetCustomers() async {
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Customers';
-
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.decode(prefs.getString('userData'));
+    var userToken = userData['token'];
     final response = await http.get(url, headers: {
       'Authorization': userToken,
       'Content-Type': 'application/json'
     });
-    print(response.body);
     try {
       final List<CustomerModel> loadedCustomers = [];
       final extractedData = json.decode(response.body);
@@ -148,6 +147,9 @@ class CustomerHttps with ChangeNotifier {
   Future<void> addCustomers(CustomerModel customer) async {
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Customers';
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.decode(prefs.getString('userData'));
+    var userToken = userData['token'];
     try {
       final response = await http.put(
         url,
@@ -186,6 +188,9 @@ class CustomerHttps with ChangeNotifier {
   Future<void> deleteCustomer(String id) async {
     final url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Customers/$id';
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.decode(prefs.getString('userData'));
+    var userToken = userData['token'];
     final existingCustomerIndex =
         _items.indexWhere((customer) => customer.id == id);
     var existingCustomer = _items[existingCustomerIndex];
@@ -212,6 +217,9 @@ class CustomerHttps with ChangeNotifier {
       if (customerIndex >= 0) {
         final url =
             'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Customers/$id';
+        final prefs = await SharedPreferences.getInstance();
+        final userData = json.decode(prefs.getString('userData'));
+        var userToken = userData['token'];
 
         final response = await http.patch(url,
             headers: {

@@ -3,14 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/order_product_model.dart';
 import '../models/order_all_model.dart';
 import '../models/http_exception.dart';
-import '../models/system_prefs.dart';
 
 class OrderHttps with ChangeNotifier {
-  final userToken = SystemPrefs.getUserData();
   List<OrderAllModel> _items = [
     // OrderModel(
     //   id: 'p1',
@@ -72,6 +71,9 @@ class OrderHttps with ChangeNotifier {
   Future<void> fetchAndSetOrder(String custId, bool isOpen) async {
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Orders/$custId?isOpen=$isOpen';
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.decode(prefs.getString('userData'));
+    var userToken = userData['token'];
 
     try {
       _items = [];
@@ -138,6 +140,9 @@ class OrderHttps with ChangeNotifier {
   Future<void> fetchAndSetAllOrder(bool isOpen) async {
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Orders?isOpen=$isOpen';
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.decode(prefs.getString('userData'));
+    var userToken = userData['token'];
 
     try {
       final response = await http.get(url, headers: {
@@ -202,6 +207,9 @@ class OrderHttps with ChangeNotifier {
     var response;
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Send/${order.custId}';
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.decode(prefs.getString('userData'));
+    var userToken = userData['token'];
     bool orderStatus = signature == null ? order.isOpen : false;
 
     //check if it is editing
@@ -275,6 +283,9 @@ class OrderHttps with ChangeNotifier {
       if (orderIndex >= 0) {
         var url =
             'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Orders/${order.custId}?orderId=${order.id}';
+        final prefs = await SharedPreferences.getInstance();
+        final userData = json.decode(prefs.getString('userData'));
+        var userToken = userData['token'];
         final response = await http.patch(url,
             headers: {
               'Authorization': userToken,
@@ -314,6 +325,9 @@ class OrderHttps with ChangeNotifier {
       OrderAllModel order, var signature, String signee) async {
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Orders/${order.custId}';
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.decode(prefs.getString('userData'));
+    var userToken = userData['token'];
     //check if it has signature. If it does, make it close else open
     bool orderStatus = signature == null ? order.isOpen : false;
 
@@ -375,6 +389,9 @@ class OrderHttps with ChangeNotifier {
   Future<void> deleteOrder(String id, String custId) async {
     final url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Orders/$custId?orderId=$id';
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.decode(prefs.getString('userData'));
+    var userToken = userData['token'];
     final existingOrderIndex = _items.indexWhere((product) => product.id == id);
     var existingOrder = _items[existingOrderIndex];
     notifyListeners();

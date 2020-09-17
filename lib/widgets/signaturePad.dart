@@ -84,8 +84,6 @@ class _SignaturePadState extends State<SignaturePad> {
                       encoded = base64
                           .encode(rawImage.value.buffer.asUint8List())
                           .toString();
-
-                      print(encoded);
                       provider.addSign(encoded);
                       Navigator.of(context).pop();
                     },
