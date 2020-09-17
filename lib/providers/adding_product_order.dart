@@ -45,7 +45,6 @@ class AddingProductOrder with ChangeNotifier {
         ),
       );
     }
-    print(_items);
     notifyListeners();
   }
 
@@ -54,7 +53,6 @@ class AddingProductOrder with ChangeNotifier {
     _items.remove(id);
 
     notifyListeners();
-    print(items);
   }
 
 //calculates the total price

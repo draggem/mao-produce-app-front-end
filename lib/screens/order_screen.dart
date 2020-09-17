@@ -56,13 +56,36 @@ class _OrderScreenState extends State<OrderScreen> {
 
 //refresh orders function
   Future<void> _refreshOrders(BuildContext context) async {
-    if (ModalRoute.of(context).settings.arguments != null) {
-      await Provider.of<OrderHttps>(context, listen: false)
-          .fetchAndSetOrder(custId, _showOnlyOpen);
-    } else {
-      await Provider.of<OrderHttps>(context, listen: false)
-          .fetchAndSetAllOrder(_showOnlyOpen);
+    try {
+      if (ModalRoute.of(context).settings.arguments != null) {
+        await Provider.of<OrderHttps>(context, listen: false)
+            .fetchAndSetOrder(custId, _showOnlyOpen);
+      } else {
+        await Provider.of<OrderHttps>(context, listen: false)
+            .fetchAndSetAllOrder(_showOnlyOpen);
+      }
+    } catch (e) {
+      _showErrorDialog(context, e);
     }
+  }
+
+  //error dialog
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('An Error Occured!'),
+        content: Text(message),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Okay'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
   }
 
   @override

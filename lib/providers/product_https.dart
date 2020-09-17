@@ -8,11 +8,11 @@ import '../models/http_exception.dart';
 
 class ProductHttps with ChangeNotifier {
   List<ProductsModel> _items = [
-    ProductsModel(
-        id: 'gago',
-        title: 'VegeTales',
-        price: 12.00,
-        url: 'https://picsum.photos/id/237/200/300'),
+    // ProductsModel(
+    //     id: 'gago',
+    //     title: 'VegeTales',
+    //     price: 12.00,
+    //     url: 'https://picsum.photos/id/237/200/300'),
   ];
 
   List<ProductsModel> get items {
@@ -103,7 +103,7 @@ class ProductHttps with ChangeNotifier {
       _items = loadedProducts;
       notifyListeners();
     } catch (e) {
-      throw (e);
+      throw "We could not connect you to the server. Please check your internet connection.";
     }
   }
 
@@ -176,12 +176,10 @@ class ProductHttps with ChangeNotifier {
               'Price': newProduct.price.toStringAsFixed(2),
               'ImageUrl': newProduct.url,
             }));
-        print(json.decode(response.body));
         _items[productIndex] = newProduct;
       }
     } catch (e) {
-      print(e);
-      throw (e);
+      throw "We could not connect you to the server. Please check your internet connection.";
     }
   }
 }

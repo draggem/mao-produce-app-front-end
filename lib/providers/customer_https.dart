@@ -133,8 +133,7 @@ class CustomerHttps with ChangeNotifier {
       _items = loadedCustomers;
       notifyListeners();
     } catch (e) {
-      print(e);
-      throw (e);
+      throw ("We could not connect you to the server. Please check your internet connection.");
     }
   }
 
@@ -159,8 +158,6 @@ class CustomerHttps with ChangeNotifier {
 
       final custId = response.body;
 
-      print(custId);
-
       final newCustomer = CustomerModel(
           id: custId,
           name: customer.name,
@@ -171,7 +168,7 @@ class CustomerHttps with ChangeNotifier {
       _items.add(newCustomer);
       notifyListeners();
     } catch (error) {
-      throw error;
+      throw "There was something wrong. Please check your internet connection";
     }
   }
 
@@ -213,12 +210,10 @@ class CustomerHttps with ChangeNotifier {
               'phonenumber': newCustomer.phone,
               'createdtimestamp': _items[customerIndex].userDate.toString(),
             }));
-        print(json.decode(response.body));
         _items[customerIndex] = newCustomer;
       }
     } catch (e) {
-      print(e);
-      throw (e);
+      throw "There was something wrong. Please check your internet connection";
     }
   }
 }

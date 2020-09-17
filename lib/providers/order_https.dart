@@ -79,7 +79,6 @@ class OrderHttps with ChangeNotifier {
       final extractedData = json.decode(response.body);
 
       if (response.statusCode == 404) {
-        print('no order ${extractedData['message']}');
         if (extractedData['message'] == 'ORDER_IS_EMPTY') {
           _items = [];
           return null;
@@ -126,7 +125,7 @@ class OrderHttps with ChangeNotifier {
       _items = loadedOrders;
       notifyListeners();
     } catch (e) {
-      print(e.toString());
+      throw "We could not connect you to the server. Please check your internet connection.";
     }
   }
 
@@ -141,7 +140,6 @@ class OrderHttps with ChangeNotifier {
       final extractedData = json.decode(response.body);
 
       if (response.statusCode == 404) {
-        print('no order ${extractedData['message']}');
         if (extractedData['message'] == 'ORDER_IS_EMPTY') {
           _items = [];
           return null;
@@ -184,7 +182,7 @@ class OrderHttps with ChangeNotifier {
       _items = loadedOrders;
       notifyListeners();
     } catch (e) {
-      print(e.toString());
+      throw "There was something wrong. Please check your internet connection";
     }
   }
 
@@ -200,8 +198,6 @@ class OrderHttps with ChangeNotifier {
 
     //check if it is editing
     if (editing || order.id != null) {
-      print(editing);
-      print(order.id);
       url += '?orderId=${order.id}';
       orderIndex = _items.indexWhere((prod) => prod.id == order.id);
       if (orderIndex >= 0) {
@@ -235,9 +231,8 @@ class OrderHttps with ChangeNotifier {
             }
           }));
     } catch (e) {
-      throw e;
+      throw "There was something wrong. Please check your internet connection";
     }
-    print(response.statusCode);
     if (editing) {
       _items[orderIndex] = order;
     } else {
@@ -294,11 +289,9 @@ class OrderHttps with ChangeNotifier {
 
         _items[orderIndex] = order;
         notifyListeners();
-      } else {
-        print('Order list is empty');
-      }
+      } else {}
     } catch (e) {
-      throw (e);
+      throw "There was something wrong. Please check your internet connection";
     }
   }
 
@@ -357,7 +350,7 @@ class OrderHttps with ChangeNotifier {
       _items.add(newOrder);
       notifyListeners();
     } catch (error) {
-      throw error;
+      throw "There was something wrong. Please check your internet connection";
     }
   }
 
@@ -371,7 +364,6 @@ class OrderHttps with ChangeNotifier {
 
     final response = await http.delete(url);
     final msg = response.body;
-    print(msg.toString());
     if (response.statusCode >= 400) {
       _items.insert(existingOrderIndex, existingOrder);
       notifyListeners();

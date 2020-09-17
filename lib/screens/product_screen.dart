@@ -30,8 +30,27 @@ class _ProductScreenState extends State<ProductScreen> {
       await Provider.of<ProductHttps>(context, listen: false)
           .fetchAndSetProducts();
     } catch (e) {
-      print(e);
+      _showErrorDialog(context, e);
     }
+  }
+
+//show error dialog
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('An Error Occured!'),
+        content: Text(message),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Okay'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
   }
 
   @override

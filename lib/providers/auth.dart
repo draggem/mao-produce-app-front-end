@@ -50,7 +50,6 @@ class Auth with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
-      print(responseData);
 
       //checks if there are errors from server e.g("INVALID_EMAIL") and throws it to send to front end
       if (responseData['error'] != null) {
@@ -85,7 +84,6 @@ class Auth with ChangeNotifier {
       //store the data inside the phone
       prefs.setString('userData', userData);
     } catch (e) {
-      print(e);
       throw e;
     }
   }
