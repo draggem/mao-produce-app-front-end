@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 
 import '../providers/adding_product_order.dart';
 
+import '../screens/edit_order_screen.dart';
+
 class SignaturePad extends StatefulWidget {
   @override
   _SignaturePadState createState() => _SignaturePadState();
@@ -19,6 +21,14 @@ class _SignaturePadState extends State<SignaturePad> {
     smoothRatio: 0.65,
     velocityRange: 2.0,
   );
+
+  var order;
+
+  @override
+  void didChangeDependencies() {
+    order = ModalRoute.of(context).settings.arguments as List<String>;
+    super.didChangeDependencies();
+  }
 
 //svg base64 code
   var encoded;
@@ -86,6 +96,9 @@ class _SignaturePadState extends State<SignaturePad> {
                           .toString();
                       provider.addSign(encoded);
                       Navigator.of(context).pop();
+                      Navigator.of(context).pushReplacementNamed(
+                          EditOrderScreen.routeName,
+                          arguments: order);
                     },
                     child: Text(
                       'Save',
