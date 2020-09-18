@@ -111,10 +111,13 @@ class CustomerHttps with ChangeNotifier {
       'Authorization': userToken,
       'Content-Type': 'application/json'
     });
+    final extractedData = json.decode(response.body);
+    print(extractedData.length);
+
     try {
       final List<CustomerModel> loadedCustomers = [];
       final extractedData = json.decode(response.body);
-
+      print(extractedData.length);
       if (extractedData == null) {
         return;
       }
@@ -139,7 +142,7 @@ class CustomerHttps with ChangeNotifier {
       _items = loadedCustomers;
       notifyListeners();
     } catch (e) {
-      throw ("We could not connect you to the server. Please check your internet connection.");
+      throw (e.toString());
     }
   }
 
