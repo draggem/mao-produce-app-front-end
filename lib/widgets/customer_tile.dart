@@ -118,101 +118,88 @@ class _CustomerTileState extends State<CustomerTile> {
       );
     }
 
-    return Container(
-      color: Colors.white,
-      child: ListTile(
-        onTap: () {
-          if (CustomerScreen.isOrderAdding) {
-            Navigator.of(context).pushNamed(
-              EditOrderScreen.routeName,
-              arguments: [widget.id, 'selection'],
-            );
-          } else {
-            return null;
-          }
-        },
-        leading: CircleAvatar(
-          backgroundColor: Theme.of(context).primaryColor,
-          child: Text('${widget.name[0]}'),
-          foregroundColor: Colors.white,
-        ),
-        title: Center(
-          child: Text(
-            widget.name,
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-            softWrap: false,
-          ),
-        ),
-      ),
-    );
-
-    // Slidable(
-    //   enabled: CustomerScreen.isOrderAdding ? false : true,
-    //   actionPane: SlidableDrawerActionPane(),
-    //   actionExtentRatio: 0.25,
-    //   child: Container(
-    //     color: Colors.white,
-    //     child: ListTile(
-    //       onTap: () {
-    //         if (CustomerScreen.isOrderAdding) {
-    //           Navigator.of(context).pushNamed(
-    //             EditOrderScreen.routeName,
-    //             arguments: [widget.id, 'selection'],
-    //           );
-    //         } else {
-    //           return null;
-    //         }
-    //       },
-    //       leading: CircleAvatar(
-    //         backgroundColor: Theme.of(context).primaryColor,
-    //         child: Text('${widget.name[0]}'),
-    //         foregroundColor: Colors.white,
-    //       ),
-    //       title: Center(
-    //         child: Text(
-    //           widget.name,
-    //           overflow: TextOverflow.ellipsis,
-    //           maxLines: 1,
-    //           softWrap: false,
-    //         ),
-    //       ),
-    //     ),
-    //   ),
-    //   secondaryActions: <Widget>[
-    //     CustomerScreen.isOrderAdding == false
-    //         ? IconSlideAction(
-    //             foregroundColor: Colors.white,
-    //             caption: 'Orders',
-    //             color: Colors.blue,
-    //             icon: Icons.assignment,
-    //             onTap: () {
-    //               Navigator.of(context).pushNamed(OrderScreen.routeName,
-    //                   arguments: [widget.id, widget.name, true]);
-    //             },
-    //           )
-    //         : Container(),
-    //     CustomerScreen.isOrderAdding == false
-    //         ? IconSlideAction(
-    //             foregroundColor: Colors.white,
-    //             caption: 'Edit',
-    //             color: Colors.orange,
-    //             icon: Icons.edit,
-    //             onTap: () {
-    //               Navigator.of(context).pushNamed(EditCustomerScreen.routeName,
-    //                   arguments: widget.id);
-    //             },
-    //           )
-    //         : Container(),
-    //     CustomerScreen.isOrderAdding == false
-    //         ? IconSlideAction(
-    //             caption: 'Delete',
-    //             color: Colors.red,
-    //             icon: Icons.delete,
-    //             onTap: () {},
-    //           )
-    //         : Container(),
-    //   ],
-    // );
+    return CustomerScreen.isOrderAdding
+        ? Container(
+            padding: EdgeInsets.only(bottom: 9),
+            child: Material(
+              elevation: 5,
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              color: Colors.white,
+              child: InkWell(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                splashColor: Theme.of(context).primaryColor,
+                onTap: () {
+                  Navigator.of(context).pushNamed(
+                    EditOrderScreen.routeName,
+                    arguments: [widget.id, 'selection'],
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  child: ListTile(
+                    title: Text(widget.name,
+                        style: TextStyle(color: Colors.black),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        softWrap: false),
+                    leading: Icon(
+                      Icons.person,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          )
+        : Slidable(
+            actionPane: SlidableDrawerActionPane(),
+            actionExtentRatio: 0.25,
+            child: Container(
+              color: Colors.white,
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  child: Text('${widget.name[0]}'),
+                  foregroundColor: Colors.white,
+                ),
+                title: Center(
+                  child: Text(
+                    widget.name,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    softWrap: false,
+                  ),
+                ),
+              ),
+            ),
+            secondaryActions: <Widget>[
+              IconSlideAction(
+                foregroundColor: Colors.white,
+                caption: 'Orders',
+                color: Colors.blue,
+                icon: Icons.assignment,
+                onTap: () {
+                  Navigator.of(context).pushNamed(OrderScreen.routeName,
+                      arguments: [widget.id, widget.name, true]);
+                },
+              ),
+              IconSlideAction(
+                foregroundColor: Colors.white,
+                caption: 'Edit',
+                color: Colors.orange,
+                icon: Icons.edit,
+                onTap: () {
+                  Navigator.of(context).pushNamed(EditCustomerScreen.routeName,
+                      arguments: widget.id);
+                },
+              ),
+              IconSlideAction(
+                caption: 'Delete',
+                color: Colors.red,
+                icon: Icons.delete,
+                onTap: () {},
+              )
+            ],
+          );
   }
 }
