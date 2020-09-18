@@ -267,7 +267,7 @@ class OrderHttps with ChangeNotifier {
         products: order.products,
         totalPrice: order.totalPrice,
       );
-      _items.add(newOrder);
+      _items.insert(0, newOrder);
     }
 
     notifyListeners();
@@ -375,7 +375,7 @@ class OrderHttps with ChangeNotifier {
         products: order.products,
         totalPrice: order.totalPrice,
       );
-      _items.add(newOrder);
+      _items.insert(0, newOrder);
       notifyListeners();
     } catch (error) {
       throw "There was something wrong. Please check your internet connection";
