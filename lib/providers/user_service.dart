@@ -3,9 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../models/user_cognito.dart';
-
 import './storage.dart';
 
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
@@ -93,13 +91,14 @@ class UserService with ChangeNotifier {
       _session = await _cognitoUser.authenticateUser(authDetails);
       _token = _session.getIdToken().getJwtToken();
       _userId = _cognitoUser.getUsername();
-      int tokenExpiry = _session.getAccessToken().getExpiration();
+      var tokenExpiry = _session.getIdToken().getExpiration();
+      print(tokenExpiry);
+      var date = new DateTime.fromMillisecondsSinceEpoch(tokenExpiry * 1000);
+      print(date.toString());
       //Convert expiry to DateTime
-      _expiryDate = DateTime.now().add(
-        Duration(
-          seconds: tokenExpiry,
-        ),
-      );
+      _expiryDate = date;
+
+      print(_expiryDate.toString());
       //set isConfirmed
       isConfirmed = true;
       //once logged in, start timer for token expiry
@@ -228,10 +227,12 @@ class UserService with ChangeNotifier {
   //logs out automatically if current user token is expired
   //this function is also used to start timer for token once logged in
   void _autoLogout() {
-    if (_authTimer != null) {
-      _authTimer.cancel();
-    }
-    final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
-    _authTimer = Timer(Duration(seconds: timeToExpiry), signOut);
+    try {
+      if (_authTimer != null) {
+        _authTimer.cancel();
+      }
+      final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
+      _authTimer = Timer(Duration(seconds: timeToExpiry), signOut);
+    } catch (e) {}
   }
 }
