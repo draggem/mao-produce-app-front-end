@@ -29,6 +29,10 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
   bool perCust = false;
   String title;
 
+//arguments for sending to signature screen to change order status
+  var formStatus;
+  var id;
+
   bool _orderStatus = true;
 
   final _form = GlobalKey<FormState>();
@@ -64,6 +68,9 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
     if (_isInit) {
       final order = ModalRoute.of(context).settings.arguments as List<String>;
       if (order[1] == 'selection') {
+        //set form status to check during signature
+        formStatus = order[1];
+        id = order[0];
         var _editedCustomer = Provider.of<CustomerHttps>(context, listen: false)
             .findById(order[0]);
         _initValues = {
@@ -81,6 +88,9 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         //initialise form as adding product
         isEditing = false;
       } else {
+        //set form status to check during signature
+        formStatus = order[1];
+        id = order[0];
         order.asMap().containsKey(2) && order[2] == "true"
             ? perCust = true
             : perCust = false;
@@ -316,6 +326,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
     if (provider.sign != null) {
       setState(() {
         isSign = true;
+        _orderStatus = false;
       });
     }
     return ScaffoldBody(
@@ -493,7 +504,10 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                     FlatButton.icon(
                         onPressed: () {
                           Navigator.of(context)
-                              .pushNamed(SignatureScreen.routeName);
+                              .pushNamed(SignatureScreen.routeName, arguments: [
+                            id.toString(),
+                            formStatus.toString()
+                          ]);
                         },
                         icon: Icon(Icons.person, color: Colors.white),
                         label: Text(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:mao_produce/providers/adding_product_order.dart';
 import 'package:provider/provider.dart';
 import 'package:vibration/vibration.dart';
 
@@ -129,6 +130,10 @@ class _CustomerTileState extends State<CustomerTile> {
                 borderRadius: BorderRadius.all(Radius.circular(10)),
                 splashColor: Theme.of(context).primaryColor,
                 onTap: () {
+                  //clears any products and signature saved after selecting a new customer
+                  var provider =
+                      Provider.of<AddingProductOrder>(context, listen: false);
+                  provider.clear();
                   Navigator.of(context).pushNamed(
                     EditOrderScreen.routeName,
                     arguments: [widget.id, 'selection'],

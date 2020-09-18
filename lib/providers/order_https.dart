@@ -276,7 +276,6 @@ class OrderHttps with ChangeNotifier {
   //update order function
   Future<void> updateOrder(
       OrderAllModel order, var signature, String signee) async {
-    bool orderStatus = signature == null ? order.isOpen : false;
     try {
       final orderIndex = _items.indexWhere((prod) => prod.id == order.id);
 
@@ -297,7 +296,7 @@ class OrderHttps with ChangeNotifier {
               'id': order.id,
               'datetime': order.orderDate.toString(),
               'totalprice': order.totalPrice,
-              'isopen': orderStatus.toString(),
+              'isopen': order.isOpen,
               'products': order.products
                   .map((item) => {
                         'id': item.id,
@@ -328,8 +327,6 @@ class OrderHttps with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final userData = json.decode(prefs.getString('userData'));
     var userToken = userData['token'];
-    //check if it has signature. If it does, make it close else open
-    bool orderStatus = signature == null ? order.isOpen : false;
 
     try {
       final response = await http.put(
@@ -345,7 +342,7 @@ class OrderHttps with ChangeNotifier {
             'id': order.id.toString(),
             'orderData': DateTime.now().toString(),
             'totalprice': order.totalPrice.toString(),
-            'isopen': orderStatus.toString(),
+            'isopen': order.isOpen,
             'products': order.products
                 .map(
                   (product) => {
@@ -373,7 +370,7 @@ class OrderHttps with ChangeNotifier {
         id: orderId,
         custId: order.custId,
         custName: order.custName,
-        isOpen: orderStatus,
+        isOpen: order.isOpen,
         orderDate: DateTime.now(),
         products: order.products,
         totalPrice: order.totalPrice,
