@@ -111,13 +111,10 @@ class CustomerHttps with ChangeNotifier {
       'Authorization': userToken,
       'Content-Type': 'application/json'
     });
-    final extractedData = json.decode(response.body);
-    print(extractedData.length);
 
     try {
       final List<CustomerModel> loadedCustomers = [];
       final extractedData = json.decode(response.body);
-      print(extractedData.length);
       if (extractedData == null) {
         return;
       }

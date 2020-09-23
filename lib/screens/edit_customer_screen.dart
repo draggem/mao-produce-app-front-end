@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-
+import '../providers/user_service.dart';
 import '../models/customer_model.dart';
 
 import '../providers/customer_https.dart';
@@ -84,51 +84,56 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
 
 //Save function
   Future<void> _saveForm() async {
-    final isValid = _form.currentState.validate();
-    if (!isValid) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    _form.currentState.save();
-
-    if (_editedCustomer.id != null) {
-      try {
-        await Provider.of<CustomerHttps>(context, listen: false)
-            .updateCustomer(_editedCustomer.id, _editedCustomer);
-      } catch (error) {
-        setState(() {
-          _isLoading = false;
-        });
-        _showErrorDialog(error.toString());
-        return;
-      }
-      setState(() {
-        _isLoading = false;
-      });
+    var provider = Provider.of<UserService>(context, listen: false);
+    if (await provider.tryAutoLogin() == false) {
+      Navigator.of(context).pushReplacementNamed('/');
     } else {
-      try {
-        await Provider.of<CustomerHttps>(context, listen: false)
-            .addCustomers(_editedCustomer);
-      } catch (error) {
+      final isValid = _form.currentState.validate();
+      if (!isValid) {
+        return;
+      }
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      _form.currentState.save();
+
+      if (_editedCustomer.id != null) {
+        try {
+          await Provider.of<CustomerHttps>(context, listen: false)
+              .updateCustomer(_editedCustomer.id, _editedCustomer);
+        } catch (error) {
+          setState(() {
+            _isLoading = false;
+          });
+          _showErrorDialog(error.toString());
+          return;
+        }
         setState(() {
           _isLoading = false;
         });
-        _showErrorDialog(error.toString());
-        return;
+      } else {
+        try {
+          await Provider.of<CustomerHttps>(context, listen: false)
+              .addCustomers(_editedCustomer);
+        } catch (error) {
+          setState(() {
+            _isLoading = false;
+          });
+          _showErrorDialog(error.toString());
+          return;
+        }
+        setState(() {
+          _isLoading = false;
+        });
       }
-      setState(() {
-        _isLoading = false;
-      });
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        CustomerScreen.routeName,
+        ModalRoute.withName(CustomerScreen.routeName),
+      );
+      Navigator.of(context).pop();
     }
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      CustomerScreen.routeName,
-      ModalRoute.withName(CustomerScreen.routeName),
-    );
-    Navigator.of(context).pop();
   }
 
   void _showErrorDialog(String message) {
