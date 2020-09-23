@@ -34,6 +34,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
   var id;
 
   bool _orderStatus = true;
+  bool isSign;
 
   final _form = GlobalKey<FormState>();
 
@@ -121,6 +122,15 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         //initialise order date if order is under edit
         _editedOrder.orderDate = selectedOrder.orderDate;
       }
+    }
+
+    //signature checks
+    isSign = false;
+    var provider = Provider.of<AddingProductOrder>(context);
+
+    if (provider.sign != null) {
+      isSign = true;
+      _orderStatus = false;
     }
     super.didChangeDependencies();
   }
@@ -320,15 +330,6 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isSign = false;
-    var provider = Provider.of<AddingProductOrder>(context);
-
-    if (provider.sign != null) {
-      setState(() {
-        isSign = true;
-        _orderStatus = false;
-      });
-    }
     return ScaffoldBody(
       appBarLeading: IconButton(
         icon: Icon(Icons.arrow_back),
@@ -461,6 +462,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                           onChanged: (value) {
                             setState(() {
                               _orderStatus = value;
+                              print(_orderStatus);
                             });
                           },
                           dataSource: [
