@@ -306,10 +306,11 @@ class OrderHttps with ChangeNotifier {
                       })
                   .toList(),
               'signature': {
-                'signature': signature,
-                'signee': signee,
+                'signature': signature == null ? '' : signature,
+                'signee': signee == null ? '' : signee,
               }
             }));
+        print("This is the response code: " + response.statusCode.toString());
 
         _items[orderIndex] = order;
         notifyListeners();

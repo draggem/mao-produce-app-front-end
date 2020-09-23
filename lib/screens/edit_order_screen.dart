@@ -209,7 +209,6 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         : Navigator.of(context).pushNamedAndRemoveUntil(
             OrderScreen.routeName, ModalRoute.withName(OrderScreen.routeName),
             arguments: [_editedOrder.custId, _editedOrder.custName, true]);
-    Navigator.of(context).pop();
   }
 
   void _showErrorDialog(String message) {
