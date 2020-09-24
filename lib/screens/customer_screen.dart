@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mao_produce/screens/auth_screen.dart';
 import 'package:mao_produce/screens/edit_customer_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/customer_https.dart';
 import '../providers/recent_searches.dart';
-
+import '../providers/user_service.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/customer_tile.dart';
 import '../widgets/scaffold_body.dart';
@@ -29,7 +30,10 @@ class _CustomerScreenState extends State<CustomerScreen> {
       await Provider.of<CustomerHttps>(context, listen: false)
           .fetchAndSetCustomers();
     } catch (e) {
-      _showErrorDialog(context, e.toString());
+      var provider = Provider.of<UserService>(context, listen: false);
+      await provider.tryAutoLogin() == false
+          ? Navigator.of(context).pushReplacementNamed('/')
+          : _showErrorDialog(context, e.toString());
     }
   }
 

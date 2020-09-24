@@ -8,7 +8,7 @@ import '../widgets/scaffold_body.dart';
 
 import '../providers/product_https.dart';
 import '../providers/recent_searches.dart';
-
+import '../providers/user_service.dart';
 import '../screens/searched_item_screen.dart';
 import '../screens/edit_product_screen.dart';
 
@@ -30,6 +30,10 @@ class _ProductScreenState extends State<ProductScreen> {
       await Provider.of<ProductHttps>(context, listen: false)
           .fetchAndSetProducts();
     } catch (e) {
+      var provider = Provider.of<UserService>(context, listen: false);
+      await provider.tryAutoLogin() == false
+          ? Navigator.of(context).pushReplacementNamed('/')
+          : _showErrorDialog(context, e.toString());
       _showErrorDialog(context, e);
     }
   }

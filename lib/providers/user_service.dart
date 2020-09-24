@@ -92,13 +92,9 @@ class UserService with ChangeNotifier {
       _token = _session.getIdToken().getJwtToken();
       _userId = _cognitoUser.getUsername();
       var tokenExpiry = _session.getIdToken().getExpiration();
-      print(tokenExpiry);
       var date = new DateTime.fromMillisecondsSinceEpoch(tokenExpiry * 1000);
-      print(date.toString());
       //Convert expiry to DateTime
       _expiryDate = date;
-
-      print(_expiryDate.toString());
       //set isConfirmed
       isConfirmed = true;
       print(_token);

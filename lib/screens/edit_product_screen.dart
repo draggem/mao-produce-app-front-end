@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/custom_icons_icons.dart';
 import '../models/products_model.dart';
-
+import '../providers/user_service.dart';
 import '../providers/product_https.dart';
 
 import '../screens/product_screen.dart';
@@ -117,56 +117,61 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   Future<void> _saveForm() async {
-    final isValid = _form.currentState.validate();
-
-    if (!isValid) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    _form.currentState.save();
-
-    if (_editedProduct.id != null) {
-      //call product update
-      try {
-        await Provider.of<ProductHttps>(context, listen: false)
-            .updateProduct(_editedProduct.id, _editedProduct);
-      } catch (e) {
-        setState(() {
-          _isLoading = false;
-        });
-        _showErrorDialog(e.toString());
-        return;
-      }
-      //if there are no errors go to product screen to reload
-      setState(() {
-        _isLoading = false;
-      });
+    var provider = Provider.of<UserService>(context, listen: false);
+    if (await provider.tryAutoLogin() == false) {
+      Navigator.of(context).pushReplacementNamed('/');
     } else {
-      //call Add product
-      try {
-        await Provider.of<ProductHttps>(context, listen: false)
-            .addProduct(_editedProduct);
-      } catch (error) {
+      final isValid = _form.currentState.validate();
+
+      if (!isValid) {
+        return;
+      }
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      _form.currentState.save();
+
+      if (_editedProduct.id != null) {
+        //call product update
+        try {
+          await Provider.of<ProductHttps>(context, listen: false)
+              .updateProduct(_editedProduct.id, _editedProduct);
+        } catch (e) {
+          setState(() {
+            _isLoading = false;
+          });
+          _showErrorDialog(e.toString());
+          return;
+        }
+        //if there are no errors go to product screen to reload
         setState(() {
           _isLoading = false;
         });
-        _showErrorDialog(error.toString());
-        return;
+      } else {
+        //call Add product
+        try {
+          await Provider.of<ProductHttps>(context, listen: false)
+              .addProduct(_editedProduct);
+        } catch (error) {
+          setState(() {
+            _isLoading = false;
+          });
+          _showErrorDialog(error.toString());
+          return;
+        }
+        //if there are no errors go to proct screen to reload
+        setState(() {
+          _isLoading = false;
+        });
       }
-      //if there are no errors go to proct screen to reload
-      setState(() {
-        _isLoading = false;
-      });
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        ProductScreen.routeName,
+        ModalRoute.withName(ProductScreen.routeName),
+      );
+      Navigator.of(context).pop();
     }
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      ProductScreen.routeName,
-      ModalRoute.withName(ProductScreen.routeName),
-    );
-    Navigator.of(context).pop();
   }
 
   @override

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-
+import '../providers/user_service.dart';
 import '../providers/order_https.dart';
 import '../providers/recent_searches.dart';
 import '../providers/adding_product_order.dart';
@@ -65,6 +65,10 @@ class _OrderScreenState extends State<OrderScreen> {
             .fetchAndSetAllOrder(_showOnlyOpen);
       }
     } catch (e) {
+      var provider = Provider.of<UserService>(context, listen: false);
+      await provider.tryAutoLogin() == false
+          ? Navigator.of(context).pushReplacementNamed('/')
+          : _showErrorDialog(context, e.toString());
       _showErrorDialog(context, e);
     }
   }

@@ -3,7 +3,7 @@ import 'package:dropdown_formfield/dropdown_formfield.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:vibration/vibration.dart';
-
+import '../providers/user_service.dart';
 import '../widgets/order_product_list.dart';
 import '../widgets/scaffold_body.dart';
 
@@ -136,67 +136,71 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
   }
 
   Future<void> _saveForm(bool isEmail) async {
-    final productListProv =
-        Provider.of<AddingProductOrder>(context, listen: false);
+    var provider = Provider.of<UserService>(context, listen: false);
+    if (await provider.tryAutoLogin() == false) {
+      Navigator.of(context).pushReplacementNamed('/');
+    } else {
+      final productListProv =
+          Provider.of<AddingProductOrder>(context, listen: false);
 
-    List<OrderProductModel> productList = [];
+      List<OrderProductModel> productList = [];
 
-    var signature;
+      var signature;
 
-    //for each function to add products inside the productList to put inside
-    //the _editedOrder product
-    productListProv.items.forEach(
-      (key, value) => productList.add(
-        OrderProductModel(
-          quantity: value.quantity,
-          id: value.id,
-          price: value.price,
-          title: value.title,
+      //for each function to add products inside the productList to put inside
+      //the _editedOrder product
+      productListProv.items.forEach(
+        (key, value) => productList.add(
+          OrderProductModel(
+            quantity: value.quantity,
+            id: value.id,
+            price: value.price,
+            title: value.title,
+          ),
         ),
-      ),
-    );
+      );
 
-    //get and check saved signature
-    signature = productListProv.sign;
+      //get and check saved signature
+      signature = productListProv.sign;
 
-    var totalprice = productListProv.totalPrice();
-    final isValid = _form.currentState.validate();
+      var totalprice = productListProv.totalPrice();
+      final isValid = _form.currentState.validate();
 
-    if (productList.isEmpty) {
-      _showErrorDialog('Please select Products for the Order');
-      return;
-    } else if (!isValid) {
-      _showErrorDialog('Form is incomplete');
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    _form.currentState.save();
-    //add product inside
-    _editedOrder.products = productList;
-    //add total price inside
-    _editedOrder.totalPrice = totalprice;
-
-    try {
-      if (!isEditing && !isEmail) {
-        await Provider.of<OrderHttps>(context, listen: false)
-            .addOrder(_editedOrder, signature, signee);
-      } else if (isEditing && !isEmail) {
-        await Provider.of<OrderHttps>(context, listen: false)
-            .updateOrder(_editedOrder, signature, signee);
-      } else {
-        await Provider.of<OrderHttps>(context, listen: false)
-            .sendEmail(_editedOrder, signature, signee, isEditing);
+      if (productList.isEmpty) {
+        _showErrorDialog('Please select Products for the Order');
+        return;
+      } else if (!isValid) {
+        _showErrorDialog('Form is incomplete');
       }
-    } catch (error) {
+
       setState(() {
-        _isLoading = false;
+        _isLoading = true;
       });
-      _showErrorDialog(error.toString());
-      return;
-    }
+
+      _form.currentState.save();
+      //add product inside
+      _editedOrder.products = productList;
+      //add total price inside
+      _editedOrder.totalPrice = totalprice;
+
+      try {
+        if (!isEditing && !isEmail) {
+          await Provider.of<OrderHttps>(context, listen: false)
+              .addOrder(_editedOrder, signature, signee);
+        } else if (isEditing && !isEmail) {
+          await Provider.of<OrderHttps>(context, listen: false)
+              .updateOrder(_editedOrder, signature, signee);
+        } else {
+          await Provider.of<OrderHttps>(context, listen: false)
+              .sendEmail(_editedOrder, signature, signee, isEditing);
+        }
+      } catch (error) {
+        setState(() {
+          _isLoading = false;
+        });
+        _showErrorDialog(error.toString());
+        return;
+      }
     setState(() {
       _isLoading = false;
     });
@@ -209,6 +213,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         : Navigator.of(context).pushNamedAndRemoveUntil(
             OrderScreen.routeName, ModalRoute.withName(OrderScreen.routeName),
             arguments: [_editedOrder.custId, _editedOrder.custName, true]);
+    }
   }
 
   void _showErrorDialog(String message) {
