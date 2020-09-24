@@ -130,10 +130,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
         });
       }
       Navigator.of(context).pushNamedAndRemoveUntil(
-        CustomerScreen.routeName,
-        ModalRoute.withName(CustomerScreen.routeName),
-      );
-      Navigator.of(context).pop();
+          CustomerScreen.routeName, (Route<dynamic> route) => false);
     }
   }
 
