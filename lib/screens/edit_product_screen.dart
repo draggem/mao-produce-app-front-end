@@ -168,10 +168,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
         });
       }
       Navigator.of(context).pushNamedAndRemoveUntil(
-        ProductScreen.routeName,
-        ModalRoute.withName(ProductScreen.routeName),
-      );
-      Navigator.of(context).pop();
+          ProductScreen.routeName, (Route<dynamic> route) => false);
     }
   }
 

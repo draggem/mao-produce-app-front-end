@@ -305,12 +305,12 @@ class OrderHttps with ChangeNotifier {
                       })
                   .toList(),
               'signature': {
-                'signature': signature == null ? '' : signature,
-                'signee': signee == null ? '' : signee,
+                'signature': signature == null ? "" : signature,
+                'signee': signee == null ? "" : signee,
               }
             }));
         print("This is the response code: " + response.statusCode.toString());
-
+        await fetchAndSetAllOrder(false);
         _items[orderIndex] = order;
         notifyListeners();
       } else {}
