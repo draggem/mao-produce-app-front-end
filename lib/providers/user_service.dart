@@ -97,6 +97,7 @@ class UserService with ChangeNotifier {
       _expiryDate = date;
       //set isConfirmed
       isConfirmed = true;
+      print(_token);
       //once logged in, start timer for token expiry
       _autoLogout();
       notifyListeners();

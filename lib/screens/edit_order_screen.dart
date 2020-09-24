@@ -34,6 +34,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
   var id;
 
   bool _orderStatus = true;
+  bool isSign;
 
   final _form = GlobalKey<FormState>();
 
@@ -122,6 +123,15 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         _editedOrder.orderDate = selectedOrder.orderDate;
       }
     }
+
+    //signature checks
+    isSign = false;
+    var provider = Provider.of<AddingProductOrder>(context);
+
+    if (provider.sign != null) {
+      isSign = true;
+      _orderStatus = false;
+    }
     super.didChangeDependencies();
   }
 
@@ -191,19 +201,18 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         _showErrorDialog(error.toString());
         return;
       }
-      setState(() {
-        _isLoading = false;
-      });
-      //added notation whether its from cust->order screen or just order screen.
-      !perCust
-          ? Navigator.of(context).pushNamedAndRemoveUntil(
-              OrderScreen.routeName,
-              ModalRoute.withName(OrderScreen.routeName),
-            )
-          : Navigator.of(context).pushNamedAndRemoveUntil(
-              OrderScreen.routeName, ModalRoute.withName(OrderScreen.routeName),
-              arguments: [_editedOrder.custId, _editedOrder.custName, true]);
-      Navigator.of(context).pop();
+    setState(() {
+      _isLoading = false;
+    });
+    //added notation whether its from cust->order screen or just order screen.
+    !perCust
+        ? Navigator.of(context).pushNamedAndRemoveUntil(
+            OrderScreen.routeName,
+            ModalRoute.withName(OrderScreen.routeName),
+          )
+        : Navigator.of(context).pushNamedAndRemoveUntil(
+            OrderScreen.routeName, ModalRoute.withName(OrderScreen.routeName),
+            arguments: [_editedOrder.custId, _editedOrder.custName, true]);
     }
   }
 
@@ -325,15 +334,6 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isSign = false;
-    var provider = Provider.of<AddingProductOrder>(context);
-
-    if (provider.sign != null) {
-      setState(() {
-        isSign = true;
-        _orderStatus = false;
-      });
-    }
     return ScaffoldBody(
       appBarLeading: IconButton(
         icon: Icon(Icons.arrow_back),
@@ -466,6 +466,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                           onChanged: (value) {
                             setState(() {
                               _orderStatus = value;
+                              print(_orderStatus);
                             });
                           },
                           dataSource: [
