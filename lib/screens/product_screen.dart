@@ -32,7 +32,8 @@ class _ProductScreenState extends State<ProductScreen> {
     } catch (e) {
       var provider = Provider.of<UserService>(context, listen: false);
       await provider.tryAutoLogin() == false
-          ? Navigator.of(context).pushReplacementNamed('/')
+          ? Navigator.of(context)
+              .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false)
           : _showErrorDialog(context, e.toString());
       _showErrorDialog(context, e);
     }

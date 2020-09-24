@@ -138,7 +138,8 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
   Future<void> _saveForm(bool isEmail) async {
     var provider = Provider.of<UserService>(context, listen: false);
     if (await provider.tryAutoLogin() == false) {
-      Navigator.of(context).pushReplacementNamed('/');
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
     } else {
       final productListProv =
           Provider.of<AddingProductOrder>(context, listen: false);
@@ -201,18 +202,18 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         _showErrorDialog(error.toString());
         return;
       }
-    setState(() {
-      _isLoading = false;
-    });
-    //added notation whether its from cust->order screen or just order screen.
-    !perCust
-        ? Navigator.of(context).pushNamedAndRemoveUntil(
-            OrderScreen.routeName,
-            ModalRoute.withName(OrderScreen.routeName),
-          )
-        : Navigator.of(context).pushNamedAndRemoveUntil(
-            OrderScreen.routeName, ModalRoute.withName(OrderScreen.routeName),
-            arguments: [_editedOrder.custId, _editedOrder.custName, true]);
+      setState(() {
+        _isLoading = false;
+      });
+      //added notation whether its from cust->order screen or just order screen.
+      !perCust
+          ? Navigator.of(context).pushNamedAndRemoveUntil(
+              OrderScreen.routeName,
+              ModalRoute.withName(OrderScreen.routeName),
+            )
+          : Navigator.of(context).pushNamedAndRemoveUntil(
+              OrderScreen.routeName, ModalRoute.withName(OrderScreen.routeName),
+              arguments: [_editedOrder.custId, _editedOrder.custName, true]);
     }
   }
 
