@@ -316,6 +316,7 @@ class OrderHttps with ChangeNotifier {
         notifyListeners();
       } else {}
     } catch (e) {
+      print(e);
       throw "There was something wrong. Please check your internet connection";
     }
   }
