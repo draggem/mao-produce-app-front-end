@@ -210,7 +210,6 @@ class OrderHttps with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final userData = json.decode(prefs.getString('userData'));
     var userToken = userData['token'];
-    bool orderStatus = signature == null ? order.isOpen : false;
 
     //check if it is editing
     if (editing || order.id != null) {
@@ -233,7 +232,7 @@ class OrderHttps with ChangeNotifier {
             'id': order.id,
             'datetime': order.orderDate.toString(),
             'totalprice': order.totalPrice,
-            'isopen': orderStatus.toString(),
+            'isopen': order.isOpen,
             'products': order.products
                 .map((item) => {
                       'id': item.id,
@@ -262,7 +261,7 @@ class OrderHttps with ChangeNotifier {
         id: orderId,
         custId: order.custId,
         custName: order.custName,
-        isOpen: orderStatus,
+        isOpen: order.isOpen,
         orderDate: DateTime.now(),
         products: order.products,
         totalPrice: order.totalPrice,
