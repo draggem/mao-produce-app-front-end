@@ -90,11 +90,12 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         isEditing = false;
       } else {
         //set form status to check during signature
-        formStatus = order[1];
-        id = order[0];
+
         order.asMap().containsKey(2) && order[2] == "true"
             ? perCust = true
             : perCust = false;
+        formStatus = order[1];
+        id = order[0];
         var selectedOrder =
             Provider.of<OrderHttps>(context, listen: false).findById(order[0]);
         _initValues = {
@@ -513,7 +514,8 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                           Navigator.of(context)
                               .pushNamed(SignatureScreen.routeName, arguments: [
                             id.toString(),
-                            formStatus.toString()
+                            formStatus.toString(),
+                            perCust.toString()
                           ]);
                         },
                         icon: Icon(Icons.person, color: Colors.white),

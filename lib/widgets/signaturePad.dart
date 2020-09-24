@@ -27,6 +27,7 @@ class _SignaturePadState extends State<SignaturePad> {
   @override
   void didChangeDependencies() {
     order = ModalRoute.of(context).settings.arguments as List<String>;
+    order.forEach((e) => print(e.toString()));
     super.didChangeDependencies();
   }
 
