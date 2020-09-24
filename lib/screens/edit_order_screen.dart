@@ -210,10 +210,10 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
       !perCust
           ? Navigator.of(context).pushNamedAndRemoveUntil(
               OrderScreen.routeName,
-              ModalRoute.withName(OrderScreen.routeName),
+              (Route<dynamic> route) => false,
             )
           : Navigator.of(context).pushNamedAndRemoveUntil(
-              OrderScreen.routeName, ModalRoute.withName(OrderScreen.routeName),
+              OrderScreen.routeName, (Route<dynamic> route) => false,
               arguments: [_editedOrder.custId, _editedOrder.custName, true]);
     }
   }
