@@ -30,7 +30,7 @@ class AddingProductOrder with ChangeNotifier {
           order.id,
           (existingProduct) => OrderProductModel(
                 id: existingProduct.id,
-                price: existingProduct.price += order.price,
+                price: order.price,
                 title: existingProduct.title,
                 quantity: existingProduct.quantity += order.quantity,
               ));
