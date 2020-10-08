@@ -77,6 +77,17 @@ class _OrderAllTileState extends State<OrderAllTile> {
                         style: TextStyle(color: Colors.white)),
                 actions: <Widget>[
                   FlatButton(
+                    child: _isLoading
+                        ? Text('')
+                        : Text(
+                            'Cancel',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  FlatButton(
                       child: _isLoading
                           ? Text('')
                           : Text(
@@ -115,17 +126,6 @@ class _OrderAllTileState extends State<OrderAllTile> {
                           ));
                         }
                       }),
-                  FlatButton(
-                    child: _isLoading
-                        ? Text('')
-                        : Text(
-                            'Cancel',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
                 ],
               );
             },

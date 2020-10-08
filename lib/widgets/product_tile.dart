@@ -62,6 +62,17 @@ class _ProductTileState extends State<ProductTile> {
                         style: TextStyle(color: Colors.white)),
                 actions: <Widget>[
                   FlatButton(
+                    child: _isLoading
+                        ? Text('')
+                        : Text(
+                            'Cancel',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  FlatButton(
                       child: _isLoading
                           ? Text('')
                           : Text(
@@ -101,17 +112,6 @@ class _ProductTileState extends State<ProductTile> {
                           ));
                         }
                       }),
-                  FlatButton(
-                    child: _isLoading
-                        ? Text('')
-                        : Text(
-                            'Cancel',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
                 ],
               );
             },

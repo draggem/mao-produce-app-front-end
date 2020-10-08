@@ -68,6 +68,12 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
   void didChangeDependencies() {
     if (_isInit) {
       final order = ModalRoute.of(context).settings.arguments as List<String>;
+
+      //checks if there is a signee saved (This code is usually run when clicking signature and going back)
+      if (order.asMap().containsKey(3)) {
+        signee = order[3];
+      }
+
       if (order[1] == 'selection') {
         //set form status to check during signature
         formStatus = order[1];
@@ -109,10 +115,16 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
           'products': selectedOrder.products,
           'totalPrice': selectedOrder.totalPrice,
         };
-        _orderStatus = selectedOrder.isOpen;
-        signee = selectedOrder.signature['signee'] == null
-            ? ''
-            : selectedOrder.signature['signee'];
+
+        //checks if there is a signee saved (This code is usually run when clicking signature and going back)
+        if (order.asMap().containsKey(3)) {
+          signee = order[3];
+        } else {
+          _orderStatus = selectedOrder.isOpen;
+          signee = selectedOrder.signature['signee'] == null
+              ? ''
+              : selectedOrder.signature['signee'];
+        }
 
         //initialise form as adding product
         isEditing = true;
@@ -249,6 +261,15 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
         actions: <Widget>[
           FlatButton(
             child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          FlatButton(
+            child: Text(
               'Go Back',
               style: TextStyle(color: Colors.white),
             ),
@@ -257,15 +278,6 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
               Navigator.of(context).pop();
             },
           ),
-          FlatButton(
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Colors.white),
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          )
         ],
       ),
     );
@@ -303,6 +315,17 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                       style: TextStyle(color: Colors.white)),
               actions: <Widget>[
                 FlatButton(
+                  child: _isLoading
+                      ? Text('')
+                      : Text(
+                          'Cancel',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                FlatButton(
                     child: _isLoading
                         ? Text('')
                         : Text(
@@ -315,17 +338,6 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                       _saveForm(true);
                       Navigator.of(context).pop();
                     }),
-                FlatButton(
-                  child: _isLoading
-                      ? Text('')
-                      : Text(
-                          'Cancel',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
               ],
             );
           },
@@ -490,6 +502,11 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
 
                     TextFormField(
                         initialValue: signee,
+                        onChanged: (value) => {
+                              setState(() {
+                                signee = value;
+                              })
+                            },
                         style: TextStyle(color: Colors.white),
                         cursorColor: Colors.white,
                         decoration: InputDecoration(
@@ -515,7 +532,8 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                               .pushNamed(SignatureScreen.routeName, arguments: [
                             id.toString(),
                             formStatus.toString(),
-                            perCust.toString()
+                            perCust.toString(),
+                            signee.toString(),
                           ]);
                         },
                         icon: Icon(Icons.person, color: Colors.white),

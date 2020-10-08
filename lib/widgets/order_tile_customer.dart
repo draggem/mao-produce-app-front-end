@@ -73,6 +73,17 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
                         style: TextStyle(color: Colors.white)),
                 actions: <Widget>[
                   FlatButton(
+                    child: _isLoading
+                        ? Text('')
+                        : Text(
+                            'Cancel',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  FlatButton(
                       child: _isLoading
                           ? Text('')
                           : Text(
@@ -97,7 +108,7 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
                               arguments: [
                                 widget.custId,
                                 widget.custName,
-                                true
+                                true,
                               ]);
                         } catch (e) {
                           setState(() {
@@ -113,17 +124,6 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
                           ));
                         }
                       }),
-                  FlatButton(
-                    child: _isLoading
-                        ? Text('')
-                        : Text(
-                            'Cancel',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
                 ],
               );
             },
@@ -231,7 +231,11 @@ class _OrderTileCustomerState extends State<OrderTileCustomer> {
             provider.clear();
             widget.products.forEach((element) => provider.addProduct(element));
             provider.addSign(widget.signature['signature']);
-            List<String> arg = [widget.id, 'edit', 'true'];
+            List<String> arg = [
+              widget.id,
+              'edit',
+              'true',
+            ];
             Navigator.of(context)
                 .pushNamed(EditOrderScreen.routeName, arguments: arg);
           },
