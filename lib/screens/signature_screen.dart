@@ -17,6 +17,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
     super.initState();
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+    SystemChrome.setEnabledSystemUIOverlays([]);
   }
 
   @override
@@ -25,6 +26,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     super.dispose();
   }
 

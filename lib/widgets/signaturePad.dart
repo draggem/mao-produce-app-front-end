@@ -40,78 +40,77 @@ class _SignaturePadState extends State<SignaturePad> {
   Widget build(BuildContext context) {
     //adding order provider
     var provider = Provider.of<AddingProductOrder>(context);
-    return SafeArea(
-      child: Stack(
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              Expanded(
-                child: Center(
-                  child: Stack(
-                    children: <Widget>[
-                      Container(
-                        width: double.infinity,
-                        constraints: BoxConstraints.expand(),
-                        color: Colors.white,
-                        child: HandSignaturePainterView(
-                          control: control,
-                          type: SignatureDrawType.shape,
-                        ),
+    return Stack(
+      children: <Widget>[
+        Column(
+          children: <Widget>[
+            Expanded(
+              child: Center(
+                child: Stack(
+                  children: <Widget>[
+                    Container(
+                      width: double.infinity,
+                      constraints: BoxConstraints.expand(),
+                      color: Colors.white,
+                      child: HandSignaturePainterView(
+                        control: control,
+                        type: SignatureDrawType.shape,
                       ),
-                      CustomPaint(
-                        painter: DebugSignaturePainterCP(
-                          control: control,
-                          cp: false,
-                          cpStart: false,
-                          cpEnd: false,
-                        ),
+                    ),
+                    CustomPaint(
+                      painter: DebugSignaturePainterCP(
+                        control: control,
+                        cp: false,
+                        cpStart: false,
+                        cpEnd: false,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              Row(
-                children: <Widget>[
-                  FlatButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(color: Colors.white),
-                    ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.white),
                   ),
-                  FlatButton(
-                    onPressed: control.clear,
-                    child: Text('Clear', style: TextStyle(color: Colors.white)),
-                  ),
-                  FlatButton(
-                    onPressed: () async {
-                      rawImage.value = await control.toImage(
-                        color: Colors.blueGrey,
-                        format: ImageByteFormat.png,
-                      );
+                ),
+                FlatButton(
+                  onPressed: control.clear,
+                  child: Text('Clear', style: TextStyle(color: Colors.white)),
+                ),
+                FlatButton(
+                  onPressed: () async {
+                    rawImage.value = await control.toImage(
+                      color: Colors.blueGrey,
+                      format: ImageByteFormat.png,
+                    );
 
-                      encoded = base64
-                          .encode(rawImage.value.buffer.asUint8List())
-                          .toString();
-                      provider.addSign(encoded);
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pushReplacementNamed(
-                          EditOrderScreen.routeName,
-                          arguments: order);
-                    },
-                    child: Text(
-                      'Save',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    encoded = base64
+                        .encode(rawImage.value.buffer.asUint8List())
+                        .toString();
+                    provider.addSign(encoded);
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pushReplacementNamed(
+                        EditOrderScreen.routeName,
+                        arguments: order);
+                  },
+                  child: Text(
+                    'Save',
+                    style: TextStyle(color: Colors.white),
                   ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
