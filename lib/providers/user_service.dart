@@ -4,13 +4,13 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../models/user_cognito.dart';
-import './storage.dart';
+//import './storage.dart';
 
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 //import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const _identityPoolId = 'ap-southeast-2:1f9ad89c-b5b6-4f82-9178-21e86f630f92';
+//const _identityPoolId = 'ap-southeast-2:1f9ad89c-b5b6-4f82-9178-21e86f630f92';
 
 class UserService with ChangeNotifier {
   //Variables required before logging in.
@@ -18,58 +18,64 @@ class UserService with ChangeNotifier {
   CognitoUser _cognitoUser;
   CognitoUserSession _session;
   CognitoCredentials credentials;
+
   //Variables you acquire when logging in.
-  String _token;
+  var _refreshToken;
+  var _accessToken;
+  String _idToken;
   DateTime _expiryDate;
   String _userId;
   Timer _authTimer;
 
   UserService(this._userPool);
 
-  //setting the getters
-  bool get isAuth {
-    return _token != null;
-  }
-
-  /// Initiate user session from local storage if present
-  Future<bool> init() async {
+  //Function that checks if tokens are valid
+  Future<bool> checkTokenExpiry() async{
     final prefs = await SharedPreferences.getInstance();
-    final storage = Storage(prefs);
-    _userPool.storage = storage;
-
-    _cognitoUser = await _userPool.getCurrentUser();
-    if (_cognitoUser == null) {
+    if (!prefs.containsKey('userData')) {
+      print('nodata');
       return false;
     }
-    _session = await _cognitoUser.getSession();
-    return _session.isValid();
+
+    final extractedUserData =
+        json.decode(prefs.getString('userData')) as Map<String, Object>;
+
+    _session.invalidateToken();
+    
+    print(_session.getAccessToken().getJwtToken());
+
+    var accessToken = new CognitoAccessToken(extractedUserData['accessToken']);
+    var idToken = new CognitoIdToken(extractedUserData['idToken']);
+    var refreshToken = new CognitoRefreshToken(extractedUserData['refreshToken']);
+
+
+    var cachedSession = new CognitoUserSession(idToken, accessToken, refreshToken: refreshToken);
+    
+
+    cachedSession.invalidateToken();
+    if (cachedSession.isValid()){
+      print("Yeeeehaww!!!");
+      return null;
+
+    }else{
+      
+      print("Pagka bogo!!!");
+
+      
+      var renew = _cognitoUser.refreshSession(refreshToken);
+      print("---------------------------------------------------------------------------------------------------------------");
+      print(_session.getAccessToken().getJwtToken());
+      return null;
+
+
+    }
   }
 
-  /// Get existing user from session with his/her attributes
-  Future<User> getCurrentUser() async {
-    if (_cognitoUser == null || _session == null) {
-      return null;
-    }
-    if (!_session.isValid()) {
-      return null;
-    }
-    final attributes = await _cognitoUser.getUserAttributes();
-    if (attributes == null) {
-      return null;
-    }
-    final user = User.fromUserAttributes(attributes);
-    user.hasAccess = true;
-    return user;
-  }
 
-  /// Retrieve user credentials -- for use with other AWS services
-  Future<CognitoCredentials> getCredentials() async {
-    if (_cognitoUser == null || _session == null) {
-      return null;
-    }
-    credentials = CognitoCredentials(_identityPoolId, _userPool);
-    await credentials.getAwsCredentials(_session.getIdToken().getJwtToken());
-    return credentials;
+
+
+  bool get isAuth {
+    return _refreshToken != null;
   }
 
   /// Login user
@@ -89,7 +95,9 @@ class UserService with ChangeNotifier {
     bool isConfirmed;
     try {
       _session = await _cognitoUser.authenticateUser(authDetails);
-      _token = _session.getIdToken().getJwtToken();
+      _idToken = _session.getIdToken().getJwtToken();
+      _refreshToken = _session.getRefreshToken().getToken();
+      _accessToken = _session.getAccessToken().getJwtToken();
       _userId = _cognitoUser.getUsername();
       var tokenExpiry = _session.getIdToken().getExpiration();
       var date = new DateTime.fromMillisecondsSinceEpoch(tokenExpiry * 1000);
@@ -97,7 +105,6 @@ class UserService with ChangeNotifier {
       _expiryDate = date;
       //set isConfirmed
       isConfirmed = true;
-      print(_token);
       //once logged in, start timer for token expiry
       _autoLogout();
       notifyListeners();
@@ -110,9 +117,11 @@ class UserService with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final userData = json.encode(
         {
-          'token': _token,
           'userId': _userId,
-          'expiryDate': _expiryDate.toIso8601String()
+          'idToken': _idToken,
+          'refreshToken': _refreshToken,
+          'accessToken': _accessToken,
+          //'expiryDate': _expiryDate.toIso8601String()
         },
       );
       //store the data inside the phone
@@ -123,7 +132,6 @@ class UserService with ChangeNotifier {
       final user = User.fromUserAttributes(attributes);
       user.confirmed = isConfirmed;
       user.hasAccess = true;
-
       return user;
     } on CognitoClientException catch (e) {
       if (e.code == 'UserNotConfirmedException') {
@@ -135,26 +143,8 @@ class UserService with ChangeNotifier {
     }
   }
 
-  /// Confirm user's account with confirmation code sent to email
-  Future<bool> confirmAccount(String email, String confirmationCode) async {
-    _cognitoUser = CognitoUser(email, _userPool, storage: _userPool.storage);
 
-    return await _cognitoUser.confirmRegistration(confirmationCode);
-  }
 
-  /// Resend confirmation code to user's email
-  Future<void> resendConfirmationCode(String email) async {
-    _cognitoUser = CognitoUser(email, _userPool, storage: _userPool.storage);
-    await _cognitoUser.resendConfirmationCode();
-  }
-
-  /// Check if user's current session is valid
-  Future<bool> checkAuthenticated() async {
-    if (_cognitoUser == null || _session == null) {
-      return false;
-    }
-    return _session.isValid();
-  }
 
   /// Sign upuser
   Future<User> signUp(String email, String password) async {
@@ -174,7 +164,7 @@ class UserService with ChangeNotifier {
 
   Future<void> signOut() async {
     try {
-      _token = null;
+      _idToken = null;
       _authTimer = null;
       _expiryDate = null;
       _userId = null;
@@ -213,7 +203,7 @@ class UserService with ChangeNotifier {
     if (expiryDate.isBefore(DateTime.now())) {
       return false;
     }
-    _token = extractedUserData['token'];
+    _idToken = extractedUserData['token'];
     _userId = extractedUserData['userId'];
     _expiryDate = expiryDate;
     notifyListeners();

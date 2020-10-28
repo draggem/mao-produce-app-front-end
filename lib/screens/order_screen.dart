@@ -33,7 +33,7 @@ class _OrderScreenState extends State<OrderScreen> {
   var appBarTitle = 'Orders';
 
   var _showOnlyOpen = true;
-  var _isInit = true;
+  ////var _isInit = true;
 
 //checks if I get customer id opening this screen
   @override
@@ -50,7 +50,7 @@ class _OrderScreenState extends State<OrderScreen> {
       }
     }
 
-    _isInit = false;
+    ////_isInit = false;
     super.didChangeDependencies();
   }
 
@@ -70,7 +70,7 @@ class _OrderScreenState extends State<OrderScreen> {
           ? Navigator.of(context)
               .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false)
           : _showErrorDialog(context, e.toString());
-      _showErrorDialog(context, e);
+      _showErrorDialog(context, e.toString());
     }
   }
 

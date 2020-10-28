@@ -201,6 +201,9 @@ class ProductHttps with ChangeNotifier {
               'Price': newProduct.price.toStringAsFixed(2),
               'ImageUrl': newProduct.url,
             }));
+            if (response.statusCode != 200){
+              throw HttpException('Unable to update product.');
+            }
         _items[productIndex] = newProduct;
       }
     } catch (e) {
