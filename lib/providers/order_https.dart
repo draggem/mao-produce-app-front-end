@@ -398,7 +398,7 @@ class OrderHttps with ChangeNotifier {
       'Authorization': userToken,
       'Content-Type': 'application/json'
     });
-    final msg = response.body;
+    //final msg = response.body;
     if (response.statusCode >= 400) {
       _items.insert(existingOrderIndex, existingOrder);
       notifyListeners();

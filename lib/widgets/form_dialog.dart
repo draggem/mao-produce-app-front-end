@@ -166,7 +166,7 @@ class _FormDialogState extends State<FormDialog> {
                             keyboardType: TextInputType.numberWithOptions(
                                 decimal: true, signed: true),
                             inputFormatters: [
-                              WhitelistingTextInputFormatter.digitsOnly
+                              FilteringTextInputFormatter.digitsOnly
                             ],
                             decoration: InputDecoration(
                               labelStyle: TextStyle(color: Colors.white),
