@@ -1,16 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../models/user_cognito.dart';
-//import './storage.dart';
-
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
-//import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-//const _identityPoolId = 'ap-southeast-2:1f9ad89c-b5b6-4f82-9178-21e86f630f92';
 
 class UserService with ChangeNotifier {
   //Variables required before logging in.
@@ -30,49 +24,44 @@ class UserService with ChangeNotifier {
   UserService(this._userPool);
 
   //Function that checks if tokens are valid
-  Future<bool> checkTokenExpiry() async{
+  void checkTokenExpiry() async {
     final prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey('userData')) {
       print('nodata');
-      return false;
+      //return false;
     }
-
     final extractedUserData =
         json.decode(prefs.getString('userData')) as Map<String, Object>;
 
-    _session.invalidateToken();
-    
-    print(_session.getAccessToken().getJwtToken());
+    var refreshToken =
+        new CognitoRefreshToken(extractedUserData['refreshToken']);
 
-    var accessToken = new CognitoAccessToken(extractedUserData['accessToken']);
-    var idToken = new CognitoIdToken(extractedUserData['idToken']);
-    var refreshToken = new CognitoRefreshToken(extractedUserData['refreshToken']);
-
-
-    var cachedSession = new CognitoUserSession(idToken, accessToken, refreshToken: refreshToken);
-    
-
-    cachedSession.invalidateToken();
-    if (cachedSession.isValid()){
-      print("Yeeeehaww!!!");
-      return null;
-
-    }else{
-      
-      print("Pagka bogo!!!");
-
-      
-      var renew = _cognitoUser.refreshSession(refreshToken);
-      print("---------------------------------------------------------------------------------------------------------------");
+    var tokens = {
+      "IdToken": extractedUserData['idToken'],
+      "AccessToken": extractedUserData['accessToken'],
+      "RefreshToken": extractedUserData['refreshToken'],
+    };
+    var cachedSesh = _cognitoUser.getCognitoUserSession(tokens);
+    if (cachedSesh.isValid()) {
+      print("Nothing to do.");
+      //return null;
+    } else {
+      print("Refresh the tokens");
+      _session = await _cognitoUser.refreshSession(refreshToken);
+      final userData = json.encode(
+        {
+          'userId': extractedUserData['userId'],
+          'idToken': _session.getIdToken().getJwtToken(),
+          'refreshToken': _session.getRefreshToken().getToken(),
+          'accessToken': _session.getAccessToken().getJwtToken(),
+        },
+      );
+      //store the data inside the phone
+      prefs.setString('userData', userData);
       print(_session.getAccessToken().getJwtToken());
-      return null;
-
-
+      //return null;
     }
   }
-
-
-
 
   bool get isAuth {
     return _refreshToken != null;
@@ -80,7 +69,6 @@ class UserService with ChangeNotifier {
 
   /// Login user
   Future<User> login(String email, String password) async {
-    //Needed
     _cognitoUser = CognitoUser(
       email,
       _userPool,
@@ -142,9 +130,6 @@ class UserService with ChangeNotifier {
       throw e;
     }
   }
-
-
-
 
   /// Sign upuser
   Future<User> signUp(String email, String password) async {
