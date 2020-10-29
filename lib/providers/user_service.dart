@@ -92,11 +92,6 @@ class UserService with ChangeNotifier {
     }
   }
 
-  void invalidateTokens() {
-    _session.invalidateToken();
-    if (_session.isValid()) {}
-  }
-
   /// Sign upuser
   Future<User> signUp(String email, String password) async {
     try {
@@ -115,7 +110,7 @@ class UserService with ChangeNotifier {
 
   Future<void> signOut() async {
     try {
-      _cognitoUser.signOut();
+      //_cognitoUser.signOut();
       _accessToken = null;
       _refreshToken = null;
       _idToken = null;
@@ -158,7 +153,7 @@ class UserService with ChangeNotifier {
     _session = new CognitoUserSession(idToken, accessToken,
         refreshToken: refreshToken);
     try {
-      if (_session.isValid()) {
+      if (!_session.isValid()) {
         _session = await _cognitoUser.refreshSession(refreshToken);
         final userData = json.encode(
           {
@@ -173,15 +168,17 @@ class UserService with ChangeNotifier {
         _idToken = _session.getIdToken().getJwtToken();
         _refreshToken = _session.getRefreshToken().getToken();
         _accessToken = _session.getAccessToken().getJwtToken();
-        notifyListeners();
-        _autoLogout();
         _idToken = extractedUserData['token'];
+        notifyListeners();
         return true;
       } else {
         _idToken = extractedUserData['token'];
+        notifyListeners();
         return true;
       }
     } catch (e) {
+      notifyListeners();
+      _autoLogout();
       print(e.toString());
       return false;
     }
