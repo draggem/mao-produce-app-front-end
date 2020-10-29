@@ -17,54 +17,15 @@ class UserService with ChangeNotifier {
   var _refreshToken;
   var _accessToken;
   String _idToken;
-  DateTime _expiryDate;
+
+  ///DateTime _expiryDate;
   String _userId;
   Timer _authTimer;
 
   UserService(this._userPool);
 
-  //Function that checks if tokens are valid
-  void checkTokenExpiry() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('userData')) {
-      print('nodata');
-      //return false;
-    }
-    final extractedUserData =
-        json.decode(prefs.getString('userData')) as Map<String, Object>;
-
-    var refreshToken =
-        new CognitoRefreshToken(extractedUserData['refreshToken']);
-
-    var tokens = {
-      "IdToken": extractedUserData['idToken'],
-      "AccessToken": extractedUserData['accessToken'],
-      "RefreshToken": extractedUserData['refreshToken'],
-    };
-    var cachedSesh = _cognitoUser.getCognitoUserSession(tokens);
-    if (cachedSesh.isValid()) {
-      print("Nothing to do.");
-      //return null;
-    } else {
-      print("Refresh the tokens");
-      _session = await _cognitoUser.refreshSession(refreshToken);
-      final userData = json.encode(
-        {
-          'userId': extractedUserData['userId'],
-          'idToken': _session.getIdToken().getJwtToken(),
-          'refreshToken': _session.getRefreshToken().getToken(),
-          'accessToken': _session.getAccessToken().getJwtToken(),
-        },
-      );
-      //store the data inside the phone
-      prefs.setString('userData', userData);
-      print(_session.getAccessToken().getJwtToken());
-      //return null;
-    }
-  }
-
   bool get isAuth {
-    return _refreshToken != null;
+    return _idToken != null;
   }
 
   /// Login user
@@ -87,10 +48,10 @@ class UserService with ChangeNotifier {
       _refreshToken = _session.getRefreshToken().getToken();
       _accessToken = _session.getAccessToken().getJwtToken();
       _userId = _cognitoUser.getUsername();
-      var tokenExpiry = _session.getIdToken().getExpiration();
-      var date = new DateTime.fromMillisecondsSinceEpoch(tokenExpiry * 1000);
+      ////var tokenExpiry = _session.getIdToken().getExpiration();
+      ////var date = new DateTime.fromMillisecondsSinceEpoch(tokenExpiry * 1000);
       //Convert expiry to DateTime
-      _expiryDate = date;
+      ////_expiryDate = date;
       //set isConfirmed
       isConfirmed = true;
       //once logged in, start timer for token expiry
@@ -106,10 +67,10 @@ class UserService with ChangeNotifier {
       final userData = json.encode(
         {
           'userId': _userId,
-          'idToken': _idToken,
+          'token': _idToken,
           'refreshToken': _refreshToken,
           'accessToken': _accessToken,
-          //'expiryDate': _expiryDate.toIso8601String()
+          ////'expiryDate': _expiryDate.toIso8601String()
         },
       );
       //store the data inside the phone
@@ -131,6 +92,11 @@ class UserService with ChangeNotifier {
     }
   }
 
+  void invalidateTokens() {
+    _session.invalidateToken();
+    if (_session.isValid()) {}
+  }
+
   /// Sign upuser
   Future<User> signUp(String email, String password) async {
     try {
@@ -149,9 +115,12 @@ class UserService with ChangeNotifier {
 
   Future<void> signOut() async {
     try {
+      _cognitoUser.signOut();
+      _accessToken = null;
+      _refreshToken = null;
       _idToken = null;
       _authTimer = null;
-      _expiryDate = null;
+      /////_expiryDate = null;
       _userId = null;
       if (credentials != null) {
         await credentials.resetAwsCredentials();
@@ -174,26 +143,48 @@ class UserService with ChangeNotifier {
   //function that Logs in straightaway if user decides to close the app
   Future<bool> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
-
-    //checks if phone has the user token stored inside
     if (!prefs.containsKey('userData')) {
       return false;
     }
 
     final extractedUserData =
         json.decode(prefs.getString('userData')) as Map<String, Object>;
-    final expiryDate = DateTime.parse(extractedUserData['expiryDate']);
 
-    //checks if expiry date is expired
-    if (expiryDate.isBefore(DateTime.now())) {
+    final refreshToken =
+        new CognitoRefreshToken(extractedUserData['refreshToken']);
+    final idToken = new CognitoIdToken(extractedUserData['token']);
+    final accessToken =
+        new CognitoAccessToken(extractedUserData['accessToken']);
+    _session = new CognitoUserSession(idToken, accessToken,
+        refreshToken: refreshToken);
+    try {
+      if (_session.isValid()) {
+        _session = await _cognitoUser.refreshSession(refreshToken);
+        final userData = json.encode(
+          {
+            'userId': extractedUserData['userId'],
+            'token': _session.getIdToken().getJwtToken(),
+            'refreshToken': _session.getRefreshToken().getToken(),
+            'accessToken': _session.getAccessToken().getJwtToken(),
+          },
+        );
+        //store the data inside the phone
+        prefs.setString('userData', userData);
+        _idToken = _session.getIdToken().getJwtToken();
+        _refreshToken = _session.getRefreshToken().getToken();
+        _accessToken = _session.getAccessToken().getJwtToken();
+        notifyListeners();
+        _autoLogout();
+        _idToken = extractedUserData['token'];
+        return true;
+      } else {
+        _idToken = extractedUserData['token'];
+        return true;
+      }
+    } catch (e) {
+      print(e.toString());
       return false;
     }
-    _idToken = extractedUserData['token'];
-    _userId = extractedUserData['userId'];
-    _expiryDate = expiryDate;
-    notifyListeners();
-    _autoLogout();
-    return true;
   }
 
   //logs out automatically if current user token is expired
@@ -203,8 +194,8 @@ class UserService with ChangeNotifier {
       if (_authTimer != null) {
         _authTimer.cancel();
       }
-      final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
-      _authTimer = Timer(Duration(seconds: timeToExpiry), signOut);
+      //final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
+      _authTimer = Timer(Duration(seconds: 86400), tryAutoLogin);
     } catch (e) {}
   }
 }
