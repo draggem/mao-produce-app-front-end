@@ -54,6 +54,15 @@ class AppDrawer extends StatelessWidget {
 
                 Provider.of<UserService>(context, listen: false).signOut();
               },
+            ),ListTile(
+              leading: Icon(Icons.exit_to_app),
+              title: Text('InvalidateTokens'),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushReplacementNamed('/');
+
+                Provider.of<UserService>(context, listen: false).invalidateToken();
+              },
             ),
           ],
         ),

@@ -19,7 +19,7 @@ class UserService with ChangeNotifier {
   String _idToken;
 
   ///DateTime _expiryDate;
-  String _userId;
+  String _userName;
   Timer _authTimer;
 
   UserService(this._userPool);
@@ -47,7 +47,7 @@ class UserService with ChangeNotifier {
       _idToken = _session.getIdToken().getJwtToken();
       _refreshToken = _session.getRefreshToken().getToken();
       _accessToken = _session.getAccessToken().getJwtToken();
-      _userId = _cognitoUser.getUsername();
+      _userName = _cognitoUser.getUsername();
       ////var tokenExpiry = _session.getIdToken().getExpiration();
       ////var date = new DateTime.fromMillisecondsSinceEpoch(tokenExpiry * 1000);
       //Convert expiry to DateTime
@@ -66,7 +66,7 @@ class UserService with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final userData = json.encode(
         {
-          'userId': _userId,
+          'userName': _userName,
           'token': _idToken,
           'refreshToken': _refreshToken,
           'accessToken': _accessToken,
@@ -116,7 +116,7 @@ class UserService with ChangeNotifier {
       _idToken = null;
       _authTimer = null;
       /////_expiryDate = null;
-      _userId = null;
+      _userName = null;
       if (credentials != null) {
         await credentials.resetAwsCredentials();
       }
@@ -135,6 +135,13 @@ class UserService with ChangeNotifier {
     }
   }
 
+  void invalidateToken(){
+    //_session.invalidateToken();
+    _cognitoUser.signOut();
+    notifyListeners();
+    tryAutoLogin();
+  }
+
   //function that Logs in straightaway if user decides to close the app
   Future<bool> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
@@ -144,19 +151,26 @@ class UserService with ChangeNotifier {
 
     final extractedUserData =
         json.decode(prefs.getString('userData')) as Map<String, Object>;
-
+    print(extractedUserData['token']);
     final refreshToken =
         new CognitoRefreshToken(extractedUserData['refreshToken']);
     final idToken = new CognitoIdToken(extractedUserData['token']);
     final accessToken =
         new CognitoAccessToken(extractedUserData['accessToken']);
-    _session = new CognitoUserSession(idToken, accessToken,
-        refreshToken: refreshToken);
+    var tokens = {
+      "idToken": idToken,
+      "accessToken": accessToken,
+      "refreshToken": refreshToken
+    };
+    // _session = new CognitoUserSession(idToken, accessToken,
+    //     refreshToken: refreshToken);
     try {
-      if (!_session.isValid()) {
+      if (_session == null) {
+        _cognitoUser = new CognitoUser(extractedUserData['userName'], _userPool);
         _session = await _cognitoUser.refreshSession(refreshToken);
         final userData = json.encode(
           {
+            'userName': extractedUserData['userName'],
             'userId': extractedUserData['userId'],
             'token': _session.getIdToken().getJwtToken(),
             'refreshToken': _session.getRefreshToken().getToken(),
@@ -177,8 +191,6 @@ class UserService with ChangeNotifier {
         return true;
       }
     } catch (e) {
-      notifyListeners();
-      _autoLogout();
       print(e.toString());
       return false;
     }
