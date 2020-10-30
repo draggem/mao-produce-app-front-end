@@ -533,7 +533,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
                             id.toString(),
                             formStatus.toString(),
                             perCust.toString(),
-                            signee.toString(),
+                            signee == null ? "" : signee.toString(),
                           ]);
                         },
                         icon: Icon(Icons.person, color: Colors.white),
