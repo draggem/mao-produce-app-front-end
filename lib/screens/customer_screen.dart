@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mao_produce/screens/auth_screen.dart';
 import 'package:mao_produce/screens/edit_customer_screen.dart';
 import 'package:provider/provider.dart';
 

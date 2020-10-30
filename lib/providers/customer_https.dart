@@ -234,6 +234,10 @@ class CustomerHttps with ChangeNotifier {
               'phonenumber': newCustomer.phone,
               'createdtimestamp': _items[customerIndex].userDate.toString(),
             }));
+
+            if (response.statusCode != 200){
+              throw HttpException('Unable to update customer.');
+            }
         _items[customerIndex] = newCustomer;
       }
     } catch (e) {

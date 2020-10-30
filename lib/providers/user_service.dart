@@ -1,16 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../models/user_cognito.dart';
-import './storage.dart';
-
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
-//import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-const _identityPoolId = 'ap-southeast-2:1f9ad89c-b5b6-4f82-9178-21e86f630f92';
 
 class UserService with ChangeNotifier {
   //Variables required before logging in.
@@ -18,63 +12,24 @@ class UserService with ChangeNotifier {
   CognitoUser _cognitoUser;
   CognitoUserSession _session;
   CognitoCredentials credentials;
+
   //Variables you acquire when logging in.
-  String _token;
-  DateTime _expiryDate;
-  String _userId;
+  var _refreshToken;
+  var _accessToken;
+  String _idToken;
+
+  ///DateTime _expiryDate;
+  String _userName;
   Timer _authTimer;
 
   UserService(this._userPool);
 
-  //setting the getters
   bool get isAuth {
-    return _token != null;
-  }
-
-  /// Initiate user session from local storage if present
-  Future<bool> init() async {
-    final prefs = await SharedPreferences.getInstance();
-    final storage = Storage(prefs);
-    _userPool.storage = storage;
-
-    _cognitoUser = await _userPool.getCurrentUser();
-    if (_cognitoUser == null) {
-      return false;
-    }
-    _session = await _cognitoUser.getSession();
-    return _session.isValid();
-  }
-
-  /// Get existing user from session with his/her attributes
-  Future<User> getCurrentUser() async {
-    if (_cognitoUser == null || _session == null) {
-      return null;
-    }
-    if (!_session.isValid()) {
-      return null;
-    }
-    final attributes = await _cognitoUser.getUserAttributes();
-    if (attributes == null) {
-      return null;
-    }
-    final user = User.fromUserAttributes(attributes);
-    user.hasAccess = true;
-    return user;
-  }
-
-  /// Retrieve user credentials -- for use with other AWS services
-  Future<CognitoCredentials> getCredentials() async {
-    if (_cognitoUser == null || _session == null) {
-      return null;
-    }
-    credentials = CognitoCredentials(_identityPoolId, _userPool);
-    await credentials.getAwsCredentials(_session.getIdToken().getJwtToken());
-    return credentials;
+    return _idToken != null;
   }
 
   /// Login user
   Future<User> login(String email, String password) async {
-    //Needed
     _cognitoUser = CognitoUser(
       email,
       _userPool,
@@ -89,15 +44,12 @@ class UserService with ChangeNotifier {
     bool isConfirmed;
     try {
       _session = await _cognitoUser.authenticateUser(authDetails);
-      _token = _session.getIdToken().getJwtToken();
-      _userId = _cognitoUser.getUsername();
-      var tokenExpiry = _session.getIdToken().getExpiration();
-      var date = new DateTime.fromMillisecondsSinceEpoch(tokenExpiry * 1000);
-      //Convert expiry to DateTime
-      _expiryDate = date;
+      _idToken = _session.getIdToken().getJwtToken();
+      _refreshToken = _session.getRefreshToken().getToken();
+      _accessToken = _session.getAccessToken().getJwtToken();
+      _userName = _cognitoUser.getUsername();
       //set isConfirmed
       isConfirmed = true;
-      print(_token);
       //once logged in, start timer for token expiry
       _autoLogout();
       notifyListeners();
@@ -110,9 +62,10 @@ class UserService with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final userData = json.encode(
         {
-          'token': _token,
-          'userId': _userId,
-          'expiryDate': _expiryDate.toIso8601String()
+          'userName': _userName,
+          'token': _idToken,
+          'refreshToken': _refreshToken,
+          'accessToken': _accessToken,
         },
       );
       //store the data inside the phone
@@ -123,7 +76,6 @@ class UserService with ChangeNotifier {
       final user = User.fromUserAttributes(attributes);
       user.confirmed = isConfirmed;
       user.hasAccess = true;
-
       return user;
     } on CognitoClientException catch (e) {
       if (e.code == 'UserNotConfirmedException') {
@@ -133,27 +85,6 @@ class UserService with ChangeNotifier {
       }
       throw e;
     }
-  }
-
-  /// Confirm user's account with confirmation code sent to email
-  Future<bool> confirmAccount(String email, String confirmationCode) async {
-    _cognitoUser = CognitoUser(email, _userPool, storage: _userPool.storage);
-
-    return await _cognitoUser.confirmRegistration(confirmationCode);
-  }
-
-  /// Resend confirmation code to user's email
-  Future<void> resendConfirmationCode(String email) async {
-    _cognitoUser = CognitoUser(email, _userPool, storage: _userPool.storage);
-    await _cognitoUser.resendConfirmationCode();
-  }
-
-  /// Check if user's current session is valid
-  Future<bool> checkAuthenticated() async {
-    if (_cognitoUser == null || _session == null) {
-      return false;
-    }
-    return _session.isValid();
   }
 
   /// Sign upuser
@@ -174,10 +105,13 @@ class UserService with ChangeNotifier {
 
   Future<void> signOut() async {
     try {
-      _token = null;
+      //_cognitoUser.signOut();
+      _accessToken = null;
+      _refreshToken = null;
+      _idToken = null;
       _authTimer = null;
-      _expiryDate = null;
-      _userId = null;
+      /////_expiryDate = null;
+      _userName = null;
       if (credentials != null) {
         await credentials.resetAwsCredentials();
       }
@@ -199,26 +133,42 @@ class UserService with ChangeNotifier {
   //function that Logs in straightaway if user decides to close the app
   Future<bool> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
-
-    //checks if phone has the user token stored inside
     if (!prefs.containsKey('userData')) {
       return false;
     }
 
     final extractedUserData =
         json.decode(prefs.getString('userData')) as Map<String, Object>;
-    final expiryDate = DateTime.parse(extractedUserData['expiryDate']);
+    final refreshToken =
+        new CognitoRefreshToken(extractedUserData['refreshToken']);
 
-    //checks if expiry date is expired
-    if (expiryDate.isBefore(DateTime.now())) {
+    try {
+      if (_session != null && _cognitoUser != null) {
+        _session = await _cognitoUser.refreshSession(refreshToken);
+        final userData = json.encode(
+          {
+            'userName': extractedUserData['userName'],
+            'token': _session.getIdToken().getJwtToken(),
+            'refreshToken': _session.getRefreshToken().getToken(),
+            'accessToken': _session.getAccessToken().getJwtToken(),
+          },
+        );
+        //store the data inside the phone
+        prefs.setString('userData', userData);
+        _idToken = _session.getIdToken().getJwtToken();
+        _refreshToken = _session.getRefreshToken().getToken();
+        _accessToken = _session.getAccessToken().getJwtToken();
+        _idToken = extractedUserData['token'];
+        notifyListeners();
+        _autoLogout();
+        return true;
+      } else {
+        signOut();
+        throw CognitoClientException("You have been signed out!");
+      }
+    } catch (e) {
       return false;
     }
-    _token = extractedUserData['token'];
-    _userId = extractedUserData['userId'];
-    _expiryDate = expiryDate;
-    notifyListeners();
-    _autoLogout();
-    return true;
   }
 
   //logs out automatically if current user token is expired
@@ -228,8 +178,8 @@ class UserService with ChangeNotifier {
       if (_authTimer != null) {
         _authTimer.cancel();
       }
-      final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
-      _authTimer = Timer(Duration(seconds: timeToExpiry), signOut);
+      //final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
+      _authTimer = Timer(Duration(seconds: 82800), tryAutoLogin);
     } catch (e) {}
   }
 }

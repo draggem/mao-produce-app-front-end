@@ -54,7 +54,7 @@ class AppDrawer extends StatelessWidget {
 
                 Provider.of<UserService>(context, listen: false).signOut();
               },
-            )
+            ),
           ],
         ),
       ),
