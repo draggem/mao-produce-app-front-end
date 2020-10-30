@@ -48,10 +48,6 @@ class UserService with ChangeNotifier {
       _refreshToken = _session.getRefreshToken().getToken();
       _accessToken = _session.getAccessToken().getJwtToken();
       _userName = _cognitoUser.getUsername();
-      ////var tokenExpiry = _session.getIdToken().getExpiration();
-      ////var date = new DateTime.fromMillisecondsSinceEpoch(tokenExpiry * 1000);
-      //Convert expiry to DateTime
-      ////_expiryDate = date;
       //set isConfirmed
       isConfirmed = true;
       //once logged in, start timer for token expiry
@@ -70,7 +66,6 @@ class UserService with ChangeNotifier {
           'token': _idToken,
           'refreshToken': _refreshToken,
           'accessToken': _accessToken,
-          ////'expiryDate': _expiryDate.toIso8601String()
         },
       );
       //store the data inside the phone
@@ -135,13 +130,6 @@ class UserService with ChangeNotifier {
     }
   }
 
-  void invalidateToken(){
-    //_session.invalidateToken();
-    _cognitoUser.signOut();
-    notifyListeners();
-    tryAutoLogin();
-  }
-
   //function that Logs in straightaway if user decides to close the app
   Future<bool> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
@@ -151,27 +139,15 @@ class UserService with ChangeNotifier {
 
     final extractedUserData =
         json.decode(prefs.getString('userData')) as Map<String, Object>;
-    print(extractedUserData['token']);
     final refreshToken =
         new CognitoRefreshToken(extractedUserData['refreshToken']);
-    final idToken = new CognitoIdToken(extractedUserData['token']);
-    final accessToken =
-        new CognitoAccessToken(extractedUserData['accessToken']);
-    var tokens = {
-      "idToken": idToken,
-      "accessToken": accessToken,
-      "refreshToken": refreshToken
-    };
-    // _session = new CognitoUserSession(idToken, accessToken,
-    //     refreshToken: refreshToken);
+
     try {
-      if (_session == null) {
-        _cognitoUser = new CognitoUser(extractedUserData['userName'], _userPool);
+      if (_session != null && _cognitoUser != null) {
         _session = await _cognitoUser.refreshSession(refreshToken);
         final userData = json.encode(
           {
             'userName': extractedUserData['userName'],
-            'userId': extractedUserData['userId'],
             'token': _session.getIdToken().getJwtToken(),
             'refreshToken': _session.getRefreshToken().getToken(),
             'accessToken': _session.getAccessToken().getJwtToken(),
@@ -184,14 +160,13 @@ class UserService with ChangeNotifier {
         _accessToken = _session.getAccessToken().getJwtToken();
         _idToken = extractedUserData['token'];
         notifyListeners();
+        _autoLogout();
         return true;
       } else {
-        _idToken = extractedUserData['token'];
-        notifyListeners();
-        return true;
+        signOut();
+        throw CognitoClientException("You have been signed out!");
       }
     } catch (e) {
-      print(e.toString());
       return false;
     }
   }
@@ -204,7 +179,7 @@ class UserService with ChangeNotifier {
         _authTimer.cancel();
       }
       //final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
-      _authTimer = Timer(Duration(seconds: 86400), tryAutoLogin);
+      _authTimer = Timer(Duration(seconds: 82800), tryAutoLogin);
     } catch (e) {}
   }
 }
