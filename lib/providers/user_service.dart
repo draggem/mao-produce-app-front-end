@@ -15,6 +15,20 @@ class UserService with ChangeNotifier {
   UserService(this._userPool);
   CognitoCredentials credentials;
   //****** */
+  Timer _refresherTime;
+
+  //******This method is auto run when app is initialized and user has signed in */
+  //***It then runs a timer that will renew Id Token automatically */
+  void refresher() {
+    try {
+      if (_refresherTime != null) {
+        _refresherTime.cancel();
+      }
+      final timeToExpiry = (_session.getIdToken().getExpiration() -
+          (DateTime.now().millisecondsSinceEpoch / 1000).round());
+      _refresherTime = Timer(Duration(seconds: timeToExpiry), init);
+    } catch (e) {}
+  }
 
   ///*** */ Initiate user session from local storage if present
   ///***THIS IS THE AUTO SIGN IN METHOD */
@@ -36,6 +50,7 @@ class UserService with ChangeNotifier {
     });
     prefs.setString('userData', userData);
     notifyListeners();
+    refresher();
     return _session.isValid();
   }
   //*********** */

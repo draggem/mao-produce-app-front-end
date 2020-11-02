@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../models/customer_model.dart';
 import '../models/http_exception.dart';
 
@@ -105,7 +104,6 @@ class CustomerHttps with ChangeNotifier {
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Customers';
     final prefs = await SharedPreferences.getInstance();
-    print(json.decode(prefs.getString('userData')));
     final userData = await json.decode(prefs.getString('userData'));
     var userToken = userData['token'];
     final response = await http.get(url, headers: {
@@ -140,6 +138,7 @@ class CustomerHttps with ChangeNotifier {
       _items = loadedCustomers;
       notifyListeners();
     } on NoSuchMethodError catch (e) {
+      print(e);
       return null;
     } catch (e) {
       throw e.toString();
