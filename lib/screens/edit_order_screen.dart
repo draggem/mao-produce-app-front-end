@@ -150,7 +150,7 @@ class _EditOrderScreenState extends State<EditOrderScreen> {
 
   Future<void> _saveForm(bool isEmail) async {
     var provider = Provider.of<UserService>(context, listen: false);
-    if (await provider.tryAutoLogin() == false) {
+    if (await provider.init() == false) {
       Navigator.of(context)
           .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
     } else {

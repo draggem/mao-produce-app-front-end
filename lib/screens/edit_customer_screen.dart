@@ -85,7 +85,7 @@ class _EditCustomerScreenState extends State<EditCustomerScreen> {
 //Save function
   Future<void> _saveForm() async {
     var provider = Provider.of<UserService>(context, listen: false);
-    if (await provider.tryAutoLogin() == false) {
+    if (await provider.init() == false) {
       Navigator.of(context)
           .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
     } else {

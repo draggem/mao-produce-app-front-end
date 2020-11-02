@@ -64,9 +64,15 @@ class _OrderScreenState extends State<OrderScreen> {
         await Provider.of<OrderHttps>(context, listen: false)
             .fetchAndSetAllOrder(_showOnlyOpen);
       }
+    } on NoSuchMethodError catch (e) {
+      var provider = Provider.of<UserService>(context, listen: false);
+      await provider.init() == false
+          ? Navigator.of(context)
+              .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false)
+          : print("Hide this exception because its not really an error");
     } catch (e) {
       var provider = Provider.of<UserService>(context, listen: false);
-      await provider.tryAutoLogin() == false
+      await provider.init() == false
           ? Navigator.of(context)
               .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false)
           : _showErrorDialog(context, e.toString());

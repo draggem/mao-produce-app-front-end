@@ -95,7 +95,7 @@ class _MyAppState extends State<MyApp> {
           home: auth.isAuth
               ? MenuScreen()
               : FutureBuilder(
-                  future: auth.tryAutoLogin(),
+                  future: auth.init(),
                   builder: (ctx, authResultSnapshot) =>
                       authResultSnapshot.connectionState ==
                               ConnectionState.waiting

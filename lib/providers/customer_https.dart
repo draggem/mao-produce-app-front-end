@@ -105,7 +105,8 @@ class CustomerHttps with ChangeNotifier {
     var url =
         'https://ddjevsdgb8.execute-api.ap-southeast-2.amazonaws.com/Prod/Customers';
     final prefs = await SharedPreferences.getInstance();
-    final userData = json.decode(prefs.getString('userData'));
+    print(json.decode(prefs.getString('userData')));
+    final userData = await json.decode(prefs.getString('userData'));
     var userToken = userData['token'];
     final response = await http.get(url, headers: {
       'Authorization': userToken,
@@ -138,8 +139,10 @@ class CustomerHttps with ChangeNotifier {
 
       _items = loadedCustomers;
       notifyListeners();
+    } on NoSuchMethodError catch (e) {
+      return null;
     } catch (e) {
-      throw (e.toString());
+      throw e.toString();
     }
   }
 
@@ -235,9 +238,9 @@ class CustomerHttps with ChangeNotifier {
               'createdtimestamp': _items[customerIndex].userDate.toString(),
             }));
 
-            if (response.statusCode != 200){
-              throw HttpException('Unable to update customer.');
-            }
+        if (response.statusCode != 200) {
+          throw HttpException('Unable to update customer.');
+        }
         _items[customerIndex] = newCustomer;
       }
     } catch (e) {

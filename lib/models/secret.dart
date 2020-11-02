@@ -3,8 +3,6 @@ import 'package:flutter/cupertino.dart';
 
 // Setup AWS User Pool Id & Client Id settings here:
 const _awsUserPoolId = 'ap-southeast-2_l21ZHZvby';
-// const _awsClientId = '7jeh8rvdp9hl80sl9cpaqb9lvl';
-// const _awsClientSecret = 'l1ip6dkdtkq8h2vjavf7st7h8oem0i4vkgbrqj58h6i6a6k5ch3';
 const _awsClientId = '49d8h3c53rsqlprucmdm7lh8p6';
 
 class Secret with ChangeNotifier {
